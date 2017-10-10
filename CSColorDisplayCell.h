@@ -4,12 +4,13 @@
 #import "PSSpecifier.h"
 
 
-@interface CSAlertColorCell : PSTableCell
+@interface CSColorDisplayCell : PSTableCell
 
 @property (nonatomic, retain) UIView *cellColorDisplay;
 @property (nonatomic, retain) NSMutableDictionary *options;
 
 - (id)initWithStyle:(long long)style reuseIdentifier:(id)identifier specifier:(PSSpecifier *)specifier;
+- (void)refreshCellDisplay;
 - (void)updateCellLabels;
 - (void)updateCellDisplayColor;
 

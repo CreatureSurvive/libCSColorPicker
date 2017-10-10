@@ -1,7 +1,15 @@
+# @Author: Dana Buehre <creaturesurvive>
+# @Date:   18-03-2017 12:09:50
+# @Email:  dbuehre@me.com
+# @Filename: Makefile
+# @Last modified by:   creaturesurvive
+# @Last modified time: 21-09-2017 2:19:35
+# @Copyright: Copyright © 2014-2017 CreatureSurvive
+
+
 GO_EASY_ON_ME = 1
 FINALPACKAGE = 1
-THEOS_DEVICE_IP = 192.168.86.197
-THEOS_DEVICE_PORT=22
+DEBUG = 0
 
 ARCHS = armv7 armv7s arm64
 

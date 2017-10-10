@@ -1,7 +1,7 @@
 Package: com.creaturesurvive.libcscolorpicker
 Name: libCSColorPicker
-Depends: 
-Version: 0.5.3
+Depends:
+Version: 0.5.7
 Architecture: iphoneos-arm
 Description: An awesome colorpicker library of some sort!!
 Maintainer: CreatureSurvive

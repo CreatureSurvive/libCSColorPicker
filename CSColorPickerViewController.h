@@ -1,8 +1,25 @@
+/**
+ * @Author: Dana Buehre <creaturesurvive>
+ * @Date:   18-03-2017 12:13:15
+ * @Email:  dbuehre@me.com
+ * @Filename: CSColorPickerViewController.h
+ * @Last modified by:   creaturesurvive
+ * @Last modified time: 08-09-2017 2:47:38
+ * @Copyright: Copyright © 2014-2017 CreatureSurvive
+ */
+
+
 #import <Preferences/PSViewController.h>
+#import <Preferences/PSListController.h>
 #import "CSColorSlider.h"
+#import "CSColorDisplayCell.h"
 #import "PSSpecifier.h"
 #import "CSColorPickerBackgroundView.h"
 #import "UIColor+CSColorPicker.h"
+
+@interface CSPListController : PSListController
+- (void)refreshCellWithSpecifier:(PSSpecifier *)specifier;
+@end
 
 
 @interface CSColorPickerViewController : PSViewController

@@ -1,3 +1,14 @@
+/**
+ * @Author: Dana Buehre <creaturesurvive>
+ * @Date:   18-03-2017 12:20:42
+ * @Email:  dbuehre@me.com
+ * @Filename: UIColor+CSColorPicker.m
+ * @Last modified by:   creaturesurvive
+ * @Last modified time: 21-09-2017 2:21:03
+ * @Copyright: Copyright © 2014-2017 CreatureSurvive
+ */
+
+
 //
 // Created by Dana Buehre on 3/17/17.
 // Copyright (c) 2017 CreatureSurvive. All rights reserved.

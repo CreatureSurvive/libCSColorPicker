@@ -1,3 +1,14 @@
+/**
+ * @Author: Dana Buehre <creaturesurvive>
+ * @Date:   18-03-2017 12:13:15
+ * @Email:  dbuehre@me.com
+ * @Filename: CSColorPickerViewController.m
+ * @Last modified by:   creaturesurvive
+ * @Last modified time: 08-09-2017 2:48:53
+ * @Copyright: Copyright © 2014-2017 CreatureSurvive
+ */
+
+
 #import "CSColorPickerViewController.h"
 
 @implementation CSColorPickerViewController
@@ -328,11 +339,18 @@
 
     NSMutableDictionary *prefsDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistPath];
 
+    NSString *color = [UIColor hexStringFromColorWithAlpha:[self colorForRGBSliders]];
+
     if (!prefsDict) prefsDict = [NSMutableDictionary dictionary];
 
-    [prefsDict setObject:[UIColor hexStringFromColorWithAlpha:[self colorForRGBSliders]] forKey:[self.options objectForKey:@"key"]];
+    [prefsDict setObject:color forKey:[self.options objectForKey:@"key"]];
 
-    [prefsDict writeToFile:plistPath atomically:YES];
+    [prefsDict writeToFile:plistPath atomically:NO];
+
+    if ([[self.specifier propertyForKey:@"parent"] respondsToSelector:@selector(refreshCellWithSpecifier:)]) {
+        [[self.specifier propertyForKey:@"parent"] performSelector:@selector(reloadSettings)];
+        [[self.specifier propertyForKey:@"parent"] performSelector:@selector(refreshCellWithSpecifier:) withObject:self.specifier];
+    }
 
     if ([self.options objectForKey:@"PostNotification"])
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
