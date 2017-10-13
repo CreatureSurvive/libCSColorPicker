@@ -15,12 +15,14 @@ extern "C" NSString *informationStringForColor(UIColor *color, BOOL wide);
 
 
 UIColor *colorFromHexStringWithFallback(NSString *hexString, NSString *fallback) {
+    
     NSString *hex = hexString && hexString.length > 0 ? hexString : fallback;
 
     return colorFromHexString(hex);
 }
 
 UIColor *colorFromHexStringWithAlpha(NSString *hexString, CGFloat alpha) {
+
     BOOL hasTag = [[hexString substringToIndex:1] isEqual:@ "#"];
     hexString = hasTag ? [hexString substringFromIndex : 1] : hexString;
 
@@ -33,12 +35,13 @@ UIColor *colorFromHexStringWithAlpha(NSString *hexString, CGFloat alpha) {
     [scanner scanHexInt: &rgbValue];
 
     return [UIColor colorWithRed: ((rgbValue & 0xFF0000) >> 16)/255.0f
-green:      ((rgbValue & 0xFF00) >> 8)/255.0f
-blue:       (rgbValue & 0xFF)/255.0f
-alpha:      alpha];
+                           green:((rgbValue & 0xFF00) >> 8)/255.0f
+                            blue:(rgbValue & 0xFF)/255.0f
+                           alpha:alpha];
 }
 
 UIColor *colorFromHexString(NSString *hexString) {
+
     CGFloat alpha = 1;
     NSString *color = @ "FF0000";
 
@@ -56,6 +59,7 @@ UIColor *colorFromHexString(NSString *hexString) {
 }
 
 BOOL isValidHexString(NSString *hexString) {
+
     NSCharacterSet *hexChars = [[NSCharacterSet characterSetWithCharactersInString:@ "0123456789ABCDEFabcdef"] invertedSet];
     return (NSNotFound == [hexString rangeOfCharacterFromSet:hexChars].location);
 }
@@ -73,7 +77,6 @@ NSString *hexStringFromColor(UIColor *color) {
 
 NSString *hexStringFromColorWithAlpha(UIColor *color) {
 
-
     CGFloat red, green, blue, alpha;
     [color getRed: &red green: &green blue: &blue alpha: &alpha];
     red = roundf(red * 255.0f);
@@ -84,6 +87,7 @@ NSString *hexStringFromColorWithAlpha(UIColor *color) {
 }
 
 NSString *informationStringForColor(UIColor *color, BOOL wide) {
+
     CGFloat h, s, b, r, g, bb;
     [color getHue: &h saturation: &s brightness: &b alpha: nil];
     [color getRed: &r green: &g blue: &bb alpha: nil];

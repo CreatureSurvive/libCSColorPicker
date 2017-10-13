@@ -1,14 +1,3 @@
-/**
- * @Author: Dana Buehre <creaturesurvive>
- * @Date:   18-03-2017 12:13:15
- * @Email:  dbuehre@me.com
- * @Filename: CSColorPickerViewController.m
- * @Last modified by:   creaturesurvive
- * @Last modified time: 08-09-2017 2:48:53
- * @Copyright: Copyright © 2014-2017 CreatureSurvive
- */
-
-
 #import "CSColorPickerViewController.h"
 
 @implementation CSColorPickerViewController

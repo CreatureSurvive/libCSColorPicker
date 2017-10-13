@@ -26,21 +26,21 @@
 
 }
 
-@property (nonatomic, retain) NSArray *values;                                 //@synthesize values=_values - In the implementation block
-@property (nonatomic, retain) NSString *name;                                  //@synthesize name=_name - In the implementation block
-@property (nonatomic, retain) id userInfo;                                      //@synthesize userInfo=_userInfo - In the implementation block
-@property (nonatomic, retain) NSDictionary *titleDictionary;                   //@synthesize titleDict=_titleDict - In the implementation block
-@property (nonatomic, retain) NSDictionary *shortTitleDictionary;              //@synthesize shortTitleDict=_shortTitleDict - In the implementation block
+@property (nonatomic, retain) NSArray *values;
+@property (nonatomic, retain) NSString *name;
+@property (nonatomic, retain) id userInfo;
+@property (nonatomic, retain) NSDictionary *titleDictionary;
+@property (nonatomic, retain) NSDictionary *shortTitleDictionary;
 @property (nonatomic, retain) NSString *identifier;
 @property (assign, nonatomic) id target;
 @property (assign, nonatomic) Class detailControllerClass;
 @property (assign, nonatomic) long long cellType;
 @property (assign, nonatomic) Class editPaneClass;
-@property (assign, nonatomic) SEL confirmationAction;                           //@synthesize confirmationAction=_confirmationAction - In the implementation block
-@property (assign, nonatomic) SEL confirmationCancelAction;                     //@synthesize confirmationCancelAction=_confirmationCancelAction - In the implementation block
-@property (assign, nonatomic) SEL buttonAction;                                 //@synthesize buttonAction=_buttonAction - In the implementation block
-@property (assign, nonatomic) SEL controllerLoadAction;                         //@synthesize controllerLoadAction=_controllerLoadAction - In the implementation block
-@property (assign, nonatomic) BOOL showContentString;                           //@synthesize showContentString=_showContentString - In the implementation block
+@property (assign, nonatomic) SEL confirmationAction;
+@property (assign, nonatomic) SEL confirmationCancelAction;
+@property (assign, nonatomic) SEL buttonAction;
+@property (assign, nonatomic) SEL controllerLoadAction;
+@property (assign, nonatomic) BOOL showContentString;
 + (id)emptyGroupSpecifier;
 + (id)groupSpecifierWithID:(id)arg1 name:(id)arg2;
 + (id)specifierWithSpecifier:(id)arg1;

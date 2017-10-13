@@ -1,14 +1,3 @@
-/**
- * @Author: Dana Buehre <creaturesurvive>
- * @Date:   18-03-2017 12:13:14
- * @Email:  dbuehre@me.com
- * @Filename: CSColorDisplayCell.m
- * @Last modified by:   creaturesurvive
- * @Last modified time: 08-09-2017 2:30:46
- * @Copyright: Copyright © 2014-2017 CreatureSurvive
- */
-
-
 #import "CSColorDisplayCell.h"
 
 @implementation CSColorDisplayCell
