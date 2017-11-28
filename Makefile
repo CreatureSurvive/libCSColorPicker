@@ -9,10 +9,9 @@ TARGET = iphone:clang:10.1:latest
 include $(THEOS)/makefiles/common.mk
 
 LIBRARY_NAME = libCSColorPicker
-libCSColorPicker_FILES = $(wildcard *.m) $(wildcard *.mm)
+libCSColorPicker_FILES = $(wildcard *.m *.mm)
 libCSColorPicker_FRAMEWORKS = UIKit CoreGraphics CoreFoundation
 libCSColorPicker_PRIVATE_FRAMEWORKS = Preferences
-libCSColorPicker_LDFLAGS = -Wl,-segalign,4000
 motuumLS_CFLAGS += -fobjc-arc
 
 after-install::
