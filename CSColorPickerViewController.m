@@ -20,7 +20,7 @@
     // self.startColor = [UIColor colorFromHexString:[self.options objectForKey:@"hexValue"]];
     // HBLogInfo(@"motuum hex:%@", [self.options objectForKey:@"hexValue"]);
     // HBLogInfo(@"motuum R:%f | G:%f | B:%f | A:%f", self.startColor.red, self.startColor.green, self.startColor.blue, self.startColor.alpha);
-
+    self.view.backgroundColor = [UIColor whiteColor];
     [self performSelector:@selector(loadColorPickerView) withObject:nil afterDelay:0];
     UIBarButtonItem *setHexButton = [[UIBarButtonItem alloc] initWithTitle:@"#" style:UIBarButtonItemStylePlain target:self action:@selector(presentHexColorAlert)];
     self.navigationItem.rightBarButtonItem = setHexButton;
@@ -67,9 +67,19 @@
 - (void)loadColorPickerView {
 
     // create views
-    self.colorPickerContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
-    self.colorPickerBackgroundView = [[CSColorPickerBackgroundView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
-    self.colorPickerPreviewView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+    CGRect bounds = self.view.bounds;
+    UIEdgeInsets insets = UIEdgeInsetsZero;
+    if (@available(iOS 11, *)) {
+        if ([self.view respondsToSelector:@selector(safeAreaInsets)]) {
+            insets = [self.view safeAreaInsets];
+            insets.top = 0;
+            bounds = UIEdgeInsetsInsetRect(self.view.bounds, insets);
+        }
+    }
+
+    self.colorPickerContainerView = [[UIView alloc] initWithFrame:bounds];
+    self.colorPickerBackgroundView = [[CSColorPickerBackgroundView alloc] initWithFrame:bounds];
+    self.colorPickerPreviewView = [[UIView alloc] initWithFrame:bounds];
 
     self.colorInformationLable = [[UILabel alloc] initWithFrame:CGRectZero];
     [self.colorInformationLable setNumberOfLines:9];

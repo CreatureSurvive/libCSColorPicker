@@ -4,7 +4,10 @@ DEBUG = 0
 
 ARCHS = armv7 armv7s arm64
 
-TARGET = iphone:clang:10.1:latest
+TARGET = iphone:clang:11.2:10.0
+
+THEOS_DEVICE_IP = 192.168.86.160
+THEOS_DEVICE_PORT = 22
 
 include $(THEOS)/makefiles/common.mk
 
