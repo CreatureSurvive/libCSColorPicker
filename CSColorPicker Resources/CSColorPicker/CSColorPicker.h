@@ -1,7 +1,8 @@
 //
 // Created by Dana Buehre on 3/17/17.
-// Copyright (c) 2017 CreatureSurvive. All rights reserved.
+// Copyright (c) 2018 CreatureCoding. All rights reserved.
 //
+
 #import <CoreFoundation/CoreFoundation.h>
 #import <UIKit/UIKit.h>
 #import "UIColor+CSColorPicker.h"

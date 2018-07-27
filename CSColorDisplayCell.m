@@ -1,13 +1,16 @@
 #import "CSColorDisplayCell.h"
+#define UIViewParentController(__view) ({ \
+        UIResponder *__responder = __view; \
+        while ([__responder isKindOfClass:[UIView class]]) \
+            __responder = [__responder nextResponder]; \
+        (UIViewController *)__responder; \
+    })
 
 @implementation CSColorDisplayCell
-@synthesize cellColorDisplay, options;
+@synthesize cellColorDisplay;
 
-- (id)initWithStyle:(long long)style reuseIdentifier:(id)identifier specifier:(PSSpecifier *)specifier {
-
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)identifier specifier:(PSSpecifier *)specifier {
     self = [super initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier specifier:specifier];
-
-    [self setOptions];
 
     return self;
 }
@@ -24,32 +27,10 @@
     [self updateCellLabels];
 }
 
-- (void)setOptions {
-    if (!self.specifier) {
-        return;
-    }
-    self.options = [NSMutableDictionary new];
-    if ([[self.specifier properties] objectForKey:@"fallback"]) {
-        [self.options setObject:[[self.specifier properties] objectForKey:@"fallback"] forKey:@"fallback"];
-    }
-    if ([[self.specifier properties] objectForKey:@"defaultsPath"]) {
-        [self.options setObject:[[self.specifier properties] objectForKey:@"defaultsPath"] forKey:@"defaultsPath"];
-    }
-    [self.options setObject:[[self.specifier properties] objectForKey:@"defaults"] forKey:@"defaults"];
-    [self.options setObject:[[self.specifier properties] objectForKey:@"key"] forKey:@"key"];
-    [self.options setObject:self.specifier forKey:@"specifier"];
-
-    if ([[self.specifier properties] objectForKey:@"PostNotification"]) {
-        [self.options setObject:[[self.specifier properties] objectForKey:@"PostNotification"] forKey:@"PostNotification"];
-    }
-//   [(PSSpecifier *)self.specifier setProperty:[self.options objectForKey:@"PostNotification"] forKey:@"NotificationListener"];
-}
-
 - (void)didMoveToSuperview {
     if (!self.specifier) {
         return;
     }
-    [self setOptions];
 
     [super didMoveToSuperview];
 
@@ -69,20 +50,31 @@
 
 - (void)openColorPickerView {
     PSViewController *viewController;
+    UIViewController *vc;
 
-    if (self.specifier.properties[@"parent"]) {
-        viewController = self.specifier.properties[@"parent"];
-    } else {
-        viewController = (PSViewController *)[[[[self nextResponder] nextResponder] nextResponder] nextResponder];
+    if ([self respondsToSelector:@selector(_viewControllerForAncestor)]) {
+        vc = [self performSelector:@selector(_viewControllerForAncestor)];
     }
+
+    if (!vc) {
+        if ([self.specifier propertyForKey:@"parent"]) {
+            vc = [self.specifier propertyForKey:@"parent"];
+        } else {
+            vc = UIViewParentController(self);
+        }
+    }
+
+    if (vc && [vc isKindOfClass:[PSViewController class]]) {
+        viewController = (PSViewController *)vc;
+    } else {
+        return;
+    }
+
 
     CSColorPickerViewController *colorViewController = [[CSColorPickerViewController alloc] initForContentSize:viewController.view.frame.size];
 
-    if (self.specifier && [[self.specifier properties] objectForKey:@"defaults"] &&
-        [[self.specifier properties] objectForKey:@"key"]) {
+    if (self.specifier && [self.specifier propertyForKey:@"defaults"] && [self.specifier propertyForKey:@"key"]) {
 
-        // PSSpecifier *specifier = self.specifier;
-        colorViewController.options = self.options;
         colorViewController.specifier = self.specifier;
     }
 
@@ -103,11 +95,11 @@
 
 - (UIColor *)previewColor {
 
-    NSString *plistPath = [NSString stringWithFormat:@"/var/mobile/Library/Preferences/%@.plist", [[self.specifier properties] objectForKey:@"defaults"]];
+    NSString *plistPath = [NSString stringWithFormat:@"/var/mobile/Library/Preferences/%@.plist", [self.specifier propertyForKey:@"defaults"]];
 
     NSDictionary *prefsDict = [NSDictionary dictionaryWithContentsOfFile:plistPath] ? : [NSDictionary dictionary];
 
-    NSDictionary *defaultsDict = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle bundleWithPath:[[self.specifier properties] objectForKey:@"defaultsPath"]]
+    NSDictionary *defaultsDict = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle bundleWithPath:[self.specifier propertyForKey:@"defaultsPath"]]
                                                                              pathForResource:@"defaults"
                                                                                       ofType:@"plist"]] ? :
                                  [NSDictionary dictionaryWithContentsOfFile:[[NSBundle bundleWithPath:@"/Library/PreferenceBundles/motuumLS.bundle"]
@@ -116,15 +108,15 @@
                                  [NSDictionary dictionary];
 
 
-    NSString *hex = [prefsDict objectForKey:[[self.specifier properties] objectForKey:@"key"]] ? :          //if default color          //then default color
-                    [defaultsDict objectForKey:[[self.specifier properties] objectForKey:@"key"]] ? :       //if defaults color         //then defaults color
-                    [prefsDict objectForKey:[[self.specifier properties] objectForKey:@"fallback"]] ? :     //else if fallback          //then fallback
+    NSString *hex = [prefsDict objectForKey:[self.specifier propertyForKey:@"key"]] ? :          //if default color          //then default color
+                    [defaultsDict objectForKey:[self.specifier propertyForKey:@"key"]] ? :       //if defaults color         //then defaults color
+                    [prefsDict objectForKey:[self.specifier propertyForKey:@"fallback"]] ? :     //else if fallback          //then fallback
                     @"FF0000)";                                                                             //else red
 
     UIColor *color = [UIColor colorFromHexString:hex];
 
-    [self.options setObject:hex forKey:@"hexValue"];
-    [self.options setObject:color forKey:@"color"];
+    [self.specifier setProperty:hex forKey:@"hexValue"];
+    [self.specifier setProperty:color forKey:@"color"];
 
     return color;
 }

@@ -13,8 +13,6 @@
 
 @interface CSColorPickerViewController : PSViewController
 
-@property (nonatomic, assign) NSMutableDictionary *options;
-
 @property (nonatomic, strong) UIView *colorPickerContainerView;
 @property (nonatomic, strong) UILabel *colorInformationLable;
 @property (nonatomic, strong) UIImageView *colorTrackImageView;
@@ -29,6 +27,8 @@
 @property (nonatomic, retain) CSColorSlider *colorPickerRedSlider;
 @property (nonatomic, retain) CSColorSlider *colorPickerGreenSlider;
 @property (nonatomic, retain) CSColorSlider *colorPickerBlueSlider;
+
+@property (nonatomic, assign) BOOL alphaEnabled;
 
 - (id)initForContentSize:(CGSize)size;
 - (void)loadColorPickerView;

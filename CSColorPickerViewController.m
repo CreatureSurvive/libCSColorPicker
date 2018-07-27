@@ -1,7 +1,6 @@
 #import "CSColorPickerViewController.h"
 
 @implementation CSColorPickerViewController
-@synthesize options;
 
 - (id)initForContentSize:(CGSize)size {
     if ([[PSViewController class] instancesRespondToSelector:@selector(initForContentSize:)]) {
@@ -17,14 +16,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // self.startColor = [UIColor colorFromHexString:[self.options objectForKey:@"hexValue"]];
-    // HBLogInfo(@"motuum hex:%@", [self.options objectForKey:@"hexValue"]);
-    // HBLogInfo(@"motuum R:%f | G:%f | B:%f | A:%f", self.startColor.red, self.startColor.green, self.startColor.blue, self.startColor.alpha);
     self.view.backgroundColor = [UIColor whiteColor];
     [self performSelector:@selector(loadColorPickerView) withObject:nil afterDelay:0];
     UIBarButtonItem *setHexButton = [[UIBarButtonItem alloc] initWithTitle:@"#" style:UIBarButtonItemStylePlain target:self action:@selector(presentHexColorAlert)];
     self.navigationItem.rightBarButtonItem = setHexButton;
-    // self.colorPickerContainerView.alpha = 0;
     self.colorPickerContainerView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0, 0);
 }
 
@@ -33,7 +28,6 @@
 
     // animate in
     [UIView animateWithDuration:0.5 animations:^{
-        // self.colorPickerContainerView.alpha = 1;
         self.colorPickerContainerView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
         self.colorPickerPreviewView.backgroundColor = [self startColor];
     }];
@@ -51,12 +45,7 @@
 }
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    // if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
-    //         toInterfaceOrientation == UIInterfaceOrientationLandscapeRight) {
-    //
-    // } else {
-    //
-    // }
+
     [self.colorPickerContainerView setFrame:self.view.frame];
     [self.colorPickerPreviewView setFrame:self.view.frame];
     [self.colorPickerBackgroundView setFrame:self.view.frame];
@@ -76,13 +65,14 @@
             bounds = UIEdgeInsetsInsetRect(self.view.bounds, insets);
         }
     }
+    self.alphaEnabled = ([self.specifier propertyForKey:@"alpha"] && ![[self.specifier propertyForKey:@"alpha"] boolValue]) ? NO : YES;
 
     self.colorPickerContainerView = [[UIView alloc] initWithFrame:bounds];
     self.colorPickerBackgroundView = [[CSColorPickerBackgroundView alloc] initWithFrame:bounds];
     self.colorPickerPreviewView = [[UIView alloc] initWithFrame:bounds];
 
     self.colorInformationLable = [[UILabel alloc] initWithFrame:CGRectZero];
-    [self.colorInformationLable setNumberOfLines:9];
+    [self.colorInformationLable setNumberOfLines:self.alphaEnabled ? 11 : 9];
     [self.colorInformationLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:20]];
     [self.colorInformationLable setBackgroundColor:[UIColor clearColor]];
     [self.colorInformationLable setTextAlignment:NSTextAlignmentCenter];
@@ -134,6 +124,10 @@
     [self.view insertSubview:self.colorPickerBackgroundView atIndex:0];
     [self.view insertSubview:self.colorPickerPreviewView atIndex:2];
     [self.view insertSubview:self.colorPickerContainerView atIndex:2];
+
+    // alpha enabled
+    self.colorPickerAlphaSlider.hidden = !self.alphaEnabled;
+    self.colorPickerAlphaSlider.userInteractionEnabled = self.alphaEnabled;
 }
 
 - (void)sliderDidChange:(CSColorSlider *)sender {
@@ -177,15 +171,15 @@
         self.colorPickerPreviewView.backgroundColor = color;
 
         [self setColorInformationTextWithInformationFromColor:color];
-        [self.options setObject:[NSString stringWithFormat:@"%@:%f", [UIColor hexStringFromColor:color], color.alpha] forKey:@"hexValue"];
+        [self.specifier setValue:[NSString stringWithFormat:@"%@:%f", [UIColor hexStringFromColor:color], color.alpha] forKey:@"hexValue"];
     } @catch (NSException *e) {
-        CSError(@"%@", e);
+        CSError(@"%@", e.description);
     }
 }
 
 - (void)setColorInformationTextWithInformationFromColor:(UIColor *)color {
-    [self.colorInformationLable setText:[UIColor informationStringForColor:color wide:[self isLandscape]]];
-    UIColor *legibilityTint = ([UIColor brightnessOfColor:self.colorForHSBSliders] < 0.5 && self.colorForHSBSliders.alpha > 0.5) ? [UIColor whiteColor] : [UIColor blackColor];
+    [self.colorInformationLable setText:[self informationStringForColor:color wide:[self isLandscape]]];
+    UIColor *legibilityTint = (![UIColor isColorLight:self.colorForHSBSliders] && self.colorForHSBSliders.alpha > 0.5) ? [UIColor whiteColor] : [UIColor blackColor];
     UIColor *shadowColor = [[UIColor whiteColor] colorWithAlphaComponent:1 - self.colorForHSBSliders.alpha];
     [self.colorInformationLable setTextColor:legibilityTint];
 
@@ -194,7 +188,7 @@
     [self.colorInformationLable.layer setShadowRadius:10];
     [self.colorInformationLable.layer setShadowOpacity:1];
 
-    [self.colorInformationLable setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:[self isLandscape] ? 16 : 20]];
+    [self.colorInformationLable setFont:[UIFont boldSystemFontOfSize:[self isLandscape] ? 16 : 20]];
 }
 
 - (BOOL)isLandscape {
@@ -254,7 +248,7 @@
         // label constraints
         [constraints addObject:[NSLayoutConstraint constraintWithItem:self.colorInformationLable attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.colorPickerContainerView attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0.0]];
         [constraints addObject:[NSLayoutConstraint constraintWithItem:self.colorInformationLable attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.colorPickerContainerView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:(navHeight / 2)]];
-        // hue constraints
+        // alpha constraints
         [constraints addObject:[NSLayoutConstraint constraintWithItem:self.colorPickerAlphaSlider attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:self.colorPickerContainerView.bounds.size.width]];
         [constraints addObject:[NSLayoutConstraint constraintWithItem:self.colorPickerAlphaSlider attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.colorPickerContainerView attribute:NSLayoutAttributeCenterX multiplier:1 constant:0]];
         [constraints addObject:[NSLayoutConstraint constraintWithItem:self.colorPickerAlphaSlider attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.colorPickerContainerView attribute:NSLayoutAttributeBottom multiplier:1 constant:-121]];
@@ -298,7 +292,7 @@
 
 - (void)presentHexColorAlert {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Set Hex Color"
-                                                                             message:@""
+                                                                             message:@"supported formats: 'RGB' 'ARGB' 'RRGGBB' 'AARRGGBB' 'RGB:0.25' 'RRGGBB:0.25'"
                                                                       preferredStyle:UIAlertControllerStyleAlert];
 
     [alertController addTextFieldWithConfigurationHandler:^(UITextField *hexField) {
@@ -329,20 +323,20 @@
 }
 
 - (UIColor *)startColor {
-    return [UIColor colorFromHexString:[self.options objectForKey:@"hexValue"]];
+    return [UIColor colorFromHexString:[self.specifier propertyForKey:@"hexValue"]];
 }
 
 - (void)saveColor {
 
-    NSString *plistPath = [NSString stringWithFormat:@"/var/mobile/Library/Preferences/%@.plist", [self.options objectForKey:@"defaults"]];
+    NSString *plistPath = [NSString stringWithFormat:@"/var/mobile/Library/Preferences/%@.plist", [self.specifier propertyForKey:@"defaults"]];
 
-    NSMutableDictionary *prefsDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistPath];
+    NSMutableDictionary *prefsDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistPath] ? : [NSMutableDictionary new];
 
-    NSString *color = [UIColor hexStringFromColorWithAlpha:[self colorForRGBSliders]];
+    NSString *color = [UIColor hexStringFromColor:[self colorForRGBSliders] alpha:YES];
 
     if (!prefsDict) prefsDict = [NSMutableDictionary dictionary];
 
-    [prefsDict setObject:color forKey:[self.options objectForKey:@"key"]];
+    [prefsDict setObject:color forKey:[self.specifier propertyForKey:@"key"]];
 
     [prefsDict writeToFile:plistPath atomically:NO];
 
@@ -351,12 +345,29 @@
         [[self.specifier propertyForKey:@"parent"] performSelector:@selector(refreshCellWithSpecifier:) withObject:self.specifier];
     }
 
-    if ([self.options objectForKey:@"PostNotification"])
+    if ([self.specifier propertyForKey:@"PostNotification"])
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
-                                             (CFStringRef)[self.options objectForKey:@"PostNotification"],
-                                             (CFStringRef)[self.options objectForKey:@"PostNotification"],
+                                             (CFStringRef)[self.specifier propertyForKey:@"PostNotification"],
+                                             (CFStringRef)[self.specifier propertyForKey:@"PostNotification"],
                                              NULL,
                                              YES);
+}
+
+- (NSString *)informationStringForColor:(UIColor *)color wide:(BOOL)wide {
+    CGFloat h, s, b, a, r, g, bb, aa;
+    [color getHue:&h saturation:&s brightness:&b alpha:&a];
+    [color getRed:&r green:&g blue:&bb alpha:&aa];
+    if (wide) {
+        if (self.alphaEnabled) {
+            return [NSString stringWithFormat:@"#%@\n\nR: %.f       H: %.f\nG: %.f       S: %.f\nB: %.f       B: %.f\nA: %.f       A: %.f", [UIColor hexStringFromColor:color], r * 255, h * 360, g * 255, s * 100, bb * 255, b * 100, aa * 100, a * 100];
+        }
+        return [NSString stringWithFormat:@"#%@\n\nR: %.f       H: %.f\nG: %.f       S: %.f\nB: %.f       B: %.f", [UIColor hexStringFromColor:color], r * 255, h * 360, g * 255, s * 100, bb * 255, b * 100];
+    } else {
+        if (self.alphaEnabled) {
+            return [NSString stringWithFormat:@"#%@\n\nR: %.f\nG: %.f\nB: %.f\nA: %.f\n\nH: %.f\nS: %.f\nB: %.f\nA: %.f", [UIColor hexStringFromColor:color], r * 255, g * 255, bb * 255, aa * 100, h * 360, s * 100, b * 100, a * 100];
+        }
+        return [NSString stringWithFormat:@"#%@\n\nR: %.f\nG: %.f\nB: %.f\n\nH: %.f\nS: %.f\nB: %.f", [UIColor hexStringFromColor:color], r * 255, g * 255, bb * 255, h * 360, s * 100, b * 100];
+    }
 }
 
 @end

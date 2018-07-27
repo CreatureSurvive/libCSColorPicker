@@ -1,13 +1,7 @@
-/**
- * @Author: Dana Buehre <creaturesurvive>
- * @Date:   24-09-2017 12:00:41
- * @Email:  dbuehre@me.com
- * @Filename: UIColor.h
- * @Last modified by:   creaturesurvive
- * @Last modified time: 24-09-2017 12:15:44
- * @Copyright: Copyright © 2014-2017 CreatureSurvive
- */
-
+//
+// Created by CreatureSurvive on 3/17/17.
+// Copyright (c) 2018 CreatureCoding. All rights reserved.
+//
 
 @interface UIColor (CSColorPicker)
 

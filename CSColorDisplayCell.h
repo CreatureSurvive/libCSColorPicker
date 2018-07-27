@@ -9,7 +9,7 @@
 @property (nonatomic, retain) UIView *cellColorDisplay;
 @property (nonatomic, retain) NSMutableDictionary *options;
 
-- (id)initWithStyle:(long long)style reuseIdentifier:(id)identifier specifier:(PSSpecifier *)specifier;
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)identifier specifier:(PSSpecifier *)specifier;
 - (void)refreshCellDisplay;
 - (void)updateCellLabels;
 - (void)updateCellDisplayColor;
