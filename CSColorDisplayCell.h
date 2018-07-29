@@ -1,3 +1,8 @@
+//
+// Created by CreatureSurvive on 3/17/17.
+// Copyright (c) 2018 CreatureCoding. All rights reserved.
+//
+
 #import <Preferences/PSViewController.h>
 #import <Preferences/PSTableCell.h>
 #import "CSColorPickerViewController.h"

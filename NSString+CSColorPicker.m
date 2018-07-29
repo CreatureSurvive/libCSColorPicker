@@ -1,14 +1,11 @@
 //
-// Created by CreatureSurvive on 3/17/17.
+// Created by CreatureSurvive on 7/28/17.
 // Copyright (c) 2018 CreatureCoding. All rights reserved.
 //
 
-#import "UIColor+CSColorPicker.h"
-
-@implementation UIColor (CSColorPicker)
+@implementation NSString (CSColorPicker)
 
 + (UIColor *)colorFromHexString:(NSString *)hexString {
-
     NSString *colorString = [[hexString stringByReplacingOccurrencesOfString:@"#" withString:@""] uppercaseString];
     CGFloat alpha, red, blue, green;
 
@@ -18,8 +15,8 @@
         alpha = [stringComponents[1] floatValue] ? : 1.0f;
     }
 
-    if (![UIColor isValidHexString:colorString]) {
-        return [UIColor redColor];
+    if (![self isValidHexString:colorString]) {
+        return [UIColor colorWithRed:255.0f green:0.0f blue:0.0f alpha:alpha];
     }
 
     switch ([colorString length]) {
@@ -68,94 +65,12 @@
     return (NSNotFound == [[[hexString stringByReplacingOccurrencesOfString:@"#" withString:@""] uppercaseString] rangeOfCharacterFromSet:hexChars].location);
 }
 
-+ (NSString *)hexStringFromColor:(UIColor *)color {
-
-    CGFloat red, green, blue;
-    [color getRed:&red green:&green blue:&blue alpha:nil];
-    red = roundf(red * 255.0f);
-    green = roundf(green * 255.0f);
-    blue = roundf(blue * 255.0f);
-
-    return [[NSString stringWithFormat:@"%02x%02x%02x", (int)red, (int)green, (int)blue] uppercaseString];
+- (UIColor *)hexColor {
+    return [NSString colorFromHexString:self];
 }
 
-+ (NSString *)hexStringFromColor:(UIColor *)color alpha:(BOOL)include {
-
-    CGFloat red, green, blue, alpha;
-    [color getRed:&red green:&green blue:&blue alpha:&alpha];
-    red = roundf(red * 255.0f);
-    green = roundf(green * 255.0f);
-    blue = roundf(blue * 255.0f);
-    alpha = roundf(alpha * 255.0f);
-
-    return include ? [[NSString stringWithFormat:@"%02x%02x%02x%02x", (int)alpha, (int)red, (int)green, (int)blue] uppercaseString] :
-           [[NSString stringWithFormat:@"%02x%02x%02x", (int)red, (int)green, (int)blue] uppercaseString];
-}
-
-+ (CGFloat)brightnessOfColor:(UIColor *)color {
-    CGFloat red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0;
-    [color getRed:&red green:&green blue:&blue alpha:&alpha];
-
-    return (((red * 255) * 299) + ((green * 255) * 587) + ((blue * 255) * 114)) / 1000;
-}
-
-+ (BOOL)isColorLight:(UIColor *)color {
-
-    return ([UIColor brightnessOfColor:color] >= 128.0);
-}
-
-- (CGFloat)alpha {
-    CGFloat a;
-    [self getWhite:NULL alpha:&a];
-    return a;
-}
-
-- (CGFloat)red {
-    CGFloat r;
-    [self getRed:&r green:NULL blue:NULL alpha:NULL];
-    return r;
-}
-
-- (CGFloat)green {
-    CGFloat g;
-    [self getRed:NULL green:&g blue:NULL alpha:NULL];
-    return g;
-}
-
-- (CGFloat)blue {
-    CGFloat b;
-    [self getRed:NULL green:NULL blue:&b alpha:NULL];
-    return b;
-}
-
-- (CGFloat)hue {
-    CGFloat h;
-    [self getHue:&h saturation:NULL brightness:NULL alpha:NULL];
-    return h;
-}
-
-- (CGFloat)saturation {
-    CGFloat s;
-    [self getHue:NULL saturation:&s brightness:NULL alpha:NULL];
-    return s;
-}
-
-- (CGFloat)brightness {
-    CGFloat b;
-    [self getHue:NULL saturation:NULL brightness:&b alpha:NULL];
-    return b;
-}
-
-- (NSString *)hexString {
-    return [UIColor hexStringFromColor:self];
-}
-
-- (BOOL)light {
-    return [UIColor isColorLight:self];
-}
-
-- (BOOL)dark {
-    return ![UIColor isColorLight:self];
+- (BOOL)validHex {
+    return [NSString isValidHexString:self];
 }
 
 @end

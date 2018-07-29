@@ -1,3 +1,8 @@
+//
+// Created by CreatureSurvive on 3/17/17.
+// Copyright (c) 2018 CreatureCoding. All rights reserved.
+//
+
 #import "CSColorPickerViewController.h"
 
 @implementation CSColorPickerViewController
@@ -65,6 +70,7 @@
             bounds = UIEdgeInsetsInsetRect(self.view.bounds, insets);
         }
     }
+
     self.alphaEnabled = ([self.specifier propertyForKey:@"alpha"] && ![[self.specifier propertyForKey:@"alpha"] boolValue]) ? NO : YES;
 
     self.colorPickerContainerView = [[UIView alloc] initWithFrame:bounds];
@@ -80,43 +86,43 @@
     [self.colorInformationLable setTranslatesAutoresizingMaskIntoConstraints:NO];
 
     //Alpha slider
-    self.colorPickerAlphaSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:6 label:@"A" startColor:[self startColor]];
+    self.colorPickerAlphaSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:CSColorSliderTypeAlpha label:@"A" startColor:[self startColor]];
     [self.colorPickerAlphaSlider addTarget:self action:@selector(sliderDidChange:) forControlEvents:UIControlEventValueChanged];
     [self.colorPickerContainerView addSubview:self.colorPickerAlphaSlider];
     [self.colorPickerAlphaSlider setTranslatesAutoresizingMaskIntoConstraints:NO];
 
     //hue slider
-    self.colorPickerHueSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:0 label:@"H" startColor:[self startColor]];
+    self.colorPickerHueSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:CSColorSliderTypeHue label:@"H" startColor:[self startColor]];
     [self.colorPickerHueSlider addTarget:self action:@selector(sliderDidChange:) forControlEvents:UIControlEventValueChanged];
     [self.colorPickerContainerView addSubview:self.colorPickerHueSlider];
     [self.colorPickerHueSlider setTranslatesAutoresizingMaskIntoConstraints:NO];
 
     // saturation slider
-    self.colorPickerSaturationSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:1 label:@"S" startColor:[self startColor]];
+    self.colorPickerSaturationSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:CSColorSliderTypeSaturation label:@"S" startColor:[self startColor]];
     [self.colorPickerSaturationSlider addTarget:self action:@selector(sliderDidChange:) forControlEvents:UIControlEventValueChanged];
     [self.colorPickerContainerView addSubview:self.colorPickerSaturationSlider];
     [self.colorPickerSaturationSlider setTranslatesAutoresizingMaskIntoConstraints:NO];
 
     // brightness slider
-    self.colorPickerBrightnessSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:2 label:@"B" startColor:[self startColor]];
+    self.colorPickerBrightnessSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:CSColorSliderTypeBrightness label:@"B" startColor:[self startColor]];
     [self.colorPickerBrightnessSlider addTarget:self action:@selector(sliderDidChange:) forControlEvents:UIControlEventValueChanged];
     [self.colorPickerContainerView addSubview:self.colorPickerBrightnessSlider];
     [self.colorPickerBrightnessSlider setTranslatesAutoresizingMaskIntoConstraints:NO];
 
     // red slider
-    self.colorPickerRedSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:3 label:@"R" startColor:[self startColor]];
+    self.colorPickerRedSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:CSColorSliderTypeRed label:@"R" startColor:[self startColor]];
     [self.colorPickerRedSlider addTarget:self action:@selector(sliderDidChange:) forControlEvents:UIControlEventValueChanged];
     [self.colorPickerContainerView addSubview:self.colorPickerRedSlider];
     [self.colorPickerRedSlider setTranslatesAutoresizingMaskIntoConstraints:NO];
 
     // green slider
-    self.colorPickerGreenSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:4 label:@"G" startColor:[self startColor]];
+    self.colorPickerGreenSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:CSColorSliderTypeGreen label:@"G" startColor:[self startColor]];
     [self.colorPickerGreenSlider addTarget:self action:@selector(sliderDidChange:) forControlEvents:UIControlEventValueChanged];
     [self.colorPickerContainerView addSubview:self.colorPickerGreenSlider];
     [self.colorPickerGreenSlider setTranslatesAutoresizingMaskIntoConstraints:NO];
 
     // blue slider
-    self.colorPickerBlueSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:5 label:@"B" startColor:[self startColor]];
+    self.colorPickerBlueSlider = [[CSColorSlider alloc] initWithFrame:CGRectZero sliderType:CSColorSliderTypeBlue label:@"B" startColor:[self startColor]];
     [self.colorPickerBlueSlider addTarget:self action:@selector(sliderDidChange:) forControlEvents:UIControlEventValueChanged];
     [self.colorPickerContainerView addSubview:self.colorPickerBlueSlider];
     [self.colorPickerBlueSlider setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -328,6 +334,10 @@
 
 - (void)saveColor {
 
+    // if ([self.specifier.target respondsToSelector:@selector(setValue:)]) {
+    //     [self.specifier.target performSelector:@selector(setValue:) withObject:[UIColor hexStringFromColor:[self colorForRGBSliders] alpha:YES] afterDelay:0];
+    // }
+
     NSString *plistPath = [NSString stringWithFormat:@"/var/mobile/Library/Preferences/%@.plist", [self.specifier propertyForKey:@"defaults"]];
 
     NSMutableDictionary *prefsDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistPath] ? : [NSMutableDictionary new];
@@ -353,6 +363,7 @@
                                              YES);
 }
 
+// well this is ugly
 - (NSString *)informationStringForColor:(UIColor *)color wide:(BOOL)wide {
     CGFloat h, s, b, a, r, g, bb, aa;
     [color getHue:&h saturation:&s brightness:&b alpha:&a];
@@ -371,18 +382,3 @@
 }
 
 @end
-// - (NSArray *)hueColors {
-//     // Create the gradient colors using hues in 5 degree increments
-//     NSMutableArray *colors = [NSMutableArray array];
-//     for (NSInteger deg = 0; deg <= 360; deg += 5) {
-
-//         UIColor *color;
-//         color = [UIColor colorWithHue:1.0 * deg / 360.0
-//                            saturation:1.0
-//                            brightness:1.0
-//                                 alpha:1.0];
-//         [colors addObject:(id)[color CGColor]];
-//     }
-
-//     return [colors copy];
-// }

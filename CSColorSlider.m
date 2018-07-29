@@ -1,3 +1,8 @@
+//
+// Created by CreatureSurvive on 3/17/17.
+// Copyright (c) 2018 CreatureCoding. All rights reserved.
+//
+
 #import "CSColorSlider.h"
 
 @interface CSColorSlider ()
@@ -13,7 +18,7 @@
 
 @implementation CSColorSlider
 
-- (instancetype)initWithFrame:(CGRect)frame sliderType:(int)sliderType label:(NSString *)label startColor:(UIColor *)startColor {
+- (instancetype)initWithFrame:(CGRect)frame sliderType:(CSColorSliderType)sliderType label:(NSString *)label startColor:(UIColor *)startColor {
     self = [super initWithFrame:frame];
     if (self) {
         [self baseInitWithType:sliderType label:label startColor:startColor];
@@ -29,7 +34,7 @@
     return self;
 }
 
-- (void)baseInitWithType:(int)sliderType label:(NSString *)label startColor:(UIColor *)startColor {
+- (void)baseInitWithType:(CSColorSliderType)sliderType label:(NSString *)label startColor:(UIColor *)startColor {
 
     _colorTrackImageView = [UIImageView new];
     [self addSubview:_colorTrackImageView];
@@ -78,8 +83,6 @@
     cellBackgroundBlur.frame = self.bounds;
     cellBackgroundBlur.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     cellBackgroundBlur.userInteractionEnabled = NO;
-    // UIVisualEffectView *viewInducingVibrancy = [[UIVisualEffectView alloc] initWithEffect:effect]; // must be the same effect as the blur view
-    // [cellBackgroundBlur.contentView addSubview:viewInducingVibrancy];
     [self insertSubview:cellBackgroundBlur atIndex:0];
 
     self.sliderType = sliderType;
@@ -138,43 +141,43 @@
 
 - (UIColor *)colorFromCurrentValue {
     switch (self.sliderType) {
-        case 0: {
+        case CSColorSliderTypeHue: {
             return [UIColor colorWithHue:self.value
                               saturation:1
                               brightness:1.0
                                    alpha:1.0];
         }
-        case 1: {
+        case CSColorSliderTypeSaturation: {
             return [UIColor colorWithHue:1.0
                               saturation:self.value
                               brightness:1.0
                                    alpha:1.0];
         }
-        case 2: {
+        case CSColorSliderTypeBrightness: {
             return [UIColor colorWithHue:1.0
                               saturation:1.0
                               brightness:self.value
                                    alpha:1.0];
         }
-        case 3: {
+        case CSColorSliderTypeRed: {
             return [UIColor colorWithRed:self.value
                                    green:1.0
                                     blue:1.0
                                    alpha:1.0];
         }
-        case 4: {
+        case CSColorSliderTypeGreen: {
             return [UIColor colorWithRed:1.0
                                    green:self.value
                                     blue:1.0
                                    alpha:1.0];
         }
-        case 5: {
+        case CSColorSliderTypeBlue: {
             return [UIColor colorWithRed:1.0
                                    green:1.0
                                     blue:self.value
                                    alpha:1.0];
         }
-        case 6: {
+        case CSColorSliderTypeAlpha: {
             return [UIColor colorWithRed:1.0
                                    green:1.0
                                     blue:1.0
@@ -194,32 +197,32 @@
     CGFloat value;
 
     switch (self.sliderType) {
-        case 0: {
+        case CSColorSliderTypeHue: {
             [color getHue:&value saturation:nil brightness:nil alpha:nil];
         } break;
-        case 1: {
+        case CSColorSliderTypeSaturation: {
             [color getHue:nil saturation:&value brightness:nil alpha:nil];
         } break;
-        case 2: {
+        case CSColorSliderTypeBrightness: {
             [color getHue:nil saturation:nil brightness:&value alpha:nil];
         } break;
-        case 3: {
+        case CSColorSliderTypeRed: {
             [color getRed:&value green:nil blue:nil alpha:nil];
         } break;
-        case 4: {
+        case CSColorSliderTypeGreen: {
             [color getRed:nil green:&value blue:nil alpha:nil];
         } break;
-        case 5: {
+        case CSColorSliderTypeBlue: {
             [color getRed:nil green:nil blue:&value alpha:nil];
         } break;
-        case 6: {
+        case CSColorSliderTypeAlpha: {
             [color getWhite:nil alpha:&value];
         } break;
         default: {
             [color getRed:&value green:nil blue:nil alpha:nil];
         } break;
     }
-    // HBLogInfo(@"motuum type:%i value:%f", self.sliderType, value);
+    
     [self setValue:value];
     self.selectedColor = color;
     [self updateTrackImage];
@@ -271,17 +274,17 @@
 
 - (float)colorMaxValue {
     switch (self.sliderType) {
-        case 0: {
+        case CSColorSliderTypeHue: {
             return 360;
         }
-        case 1:
-        case 6:
-        case 2: {
+        case CSColorSliderTypeSaturation:
+        case CSColorSliderTypeBrightness:
+        case CSColorSliderTypeAlpha: {
             return 100;
         }
-        case 3:
-        case 4:
-        case 5: {
+        case CSColorSliderTypeRed:
+        case CSColorSliderTypeGreen:
+        case CSColorSliderTypeBlue: {
             return 255;
         }
         default: {
@@ -292,26 +295,25 @@
 
 - (void)updateTrackImage {
     switch (self.sliderType) {
-        case 0: {
-            // self.currentTrackImage = [UIImage imageWithContentsOfFile:@"/Library/PreferenceBundles/motuumLS.bundle/colorTrack.png"];
+        case CSColorSliderTypeHue: {
             self.currentTrackImage = [self hueTrackImage];
         } break;
-        case 1: {
+        case CSColorSliderTypeSaturation: {
             self.currentTrackImage = [self imageWithGradientStart:[UIColor whiteColor] end:self.selectedColor size:CGSizeMake(512, 1)];
         } break;
-        case 2: {
+        case CSColorSliderTypeBrightness: {
             self.currentTrackImage = [self imageWithGradientStart:[UIColor blackColor] end:self.selectedColor size:CGSizeMake(512, 1)];
         } break;
-        case 3: {
+        case CSColorSliderTypeRed: {
             self.currentTrackImage = [self imageWithColor:[UIColor redColor] size:CGSizeMake(1, 1)];
         } break;
-        case 4: {
+        case CSColorSliderTypeGreen: {
             self.currentTrackImage = [self imageWithColor:[UIColor greenColor] size:CGSizeMake(1, 1)];
         } break;
-        case 5: {
+        case CSColorSliderTypeBlue: {
             self.currentTrackImage = [self imageWithColor:[UIColor blueColor] size:CGSizeMake(1, 1)];
         } break;
-        case 6: {
+        case CSColorSliderTypeAlpha: {
             self.currentTrackImage = [self imageWithGradientStart:[UIColor clearColor] end:self.selectedColor size:CGSizeMake(512, 1)];
         } break;
         default: {
@@ -327,9 +329,8 @@
 - (UIImage *)hueTrackImage {
     CGRect rect = CGRectMake(0, 0, 512, 1);
 
-    // Create the gradient colors using hues in 5 degree increments
     NSMutableArray *colors = [NSMutableArray array];
-    for (NSInteger deg = 0; deg <= 360; deg += 1) {
+    for (NSInteger deg = 0; deg <= 360; deg += 5) {
 
         UIColor *color;
         color = [UIColor colorWithHue:1.0f * deg / 360.0f
@@ -347,7 +348,7 @@
     gradient.colors = colors;
 
     UIGraphicsBeginImageContext(rect.size);
-    // CGContextRef context = UIGraphicsGetCurrentContext();
+
     [gradient renderInContext:UIGraphicsGetCurrentContext()];
 
     UIImage *img = UIGraphicsGetImageFromCurrentImageContext();

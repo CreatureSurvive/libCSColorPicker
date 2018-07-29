@@ -1,12 +1,17 @@
+//
+// Created by CreatureSurvive on 3/17/17.
+// Copyright (c) 2018 CreatureCoding. All rights reserved.
+//
+
 #import <Preferences/PSViewController.h>
 #import <Preferences/PSListController.h>
+#import "PSSpecifier.h"
 #import "CSColorSlider.h"
 #import "CSColorDisplayCell.h"
-#import "PSSpecifier.h"
-#import "CSColorPickerBackgroundView.h"
 #import "UIColor+CSColorPicker.h"
+#import "CSColorPickerBackgroundView.h"
 
-@interface CSPListController : PSListController
+@interface CSPListController : PSViewController
 - (void)refreshCellWithSpecifier:(PSSpecifier *)specifier;
 @end
 

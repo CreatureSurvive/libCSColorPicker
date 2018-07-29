@@ -1,4 +1,12 @@
+//
+// Created by CreatureSurvive on 3/17/17.
+// Copyright (c) 2018 CreatureCoding. All rights reserved.
+//
+
 #import "CSColorDisplayCell.h"
+
+// get the associated view controller from a UIView
+// credits https://stackoverflow.com/questions/1372977/given-a-view-how-do-i-get-its-viewcontroller/24590678
 #define UIViewParentController(__view) ({ \
         UIResponder *__responder = __view; \
         while ([__responder isKindOfClass:[UIView class]]) \
@@ -10,7 +18,11 @@
 @synthesize cellColorDisplay;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)identifier specifier:(PSSpecifier *)specifier {
-    self = [super initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier specifier:specifier];
+
+    if ((self = [super initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier specifier:specifier])) {
+        [specifier setTarget:self];
+        [specifier setButtonAction:@selector(openColorPickerView)];
+    }
 
     return self;
 }
@@ -18,13 +30,12 @@
 - (void)refreshCellContentsWithSpecifier:(PSSpecifier *)specifier {
     [super refreshCellContentsWithSpecifier:specifier];
 
-    [self updateCellLabels];
-    [self updateCellDisplayColor];
+    [self refreshCellDisplay];
 }
 
 - (void)refreshCellDisplay {
-    [self updateCellDisplayColor];
     [self updateCellLabels];
+    [self updateCellDisplayColor];
 }
 
 - (void)didMoveToSuperview {
@@ -34,18 +45,18 @@
 
     [super didMoveToSuperview];
 
+    [self configureColorDisplay];
+    [self updateCellLabels];
+    [self updateCellDisplayColor];
+}
+
+- (void)configureColorDisplay {
     self.cellColorDisplay = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 58, 29)];
-    self.cellColorDisplay.tag = 199;     //disables coloring somehow
+    self.cellColorDisplay.tag = 999;
     self.cellColorDisplay.layer.cornerRadius = CGRectGetHeight(self.cellColorDisplay.frame) / 4;
     self.cellColorDisplay.layer.borderWidth = 2;
     self.cellColorDisplay.layer.borderColor = [UIColor lightGrayColor].CGColor;
     [self setAccessoryView:self.cellColorDisplay];
-
-    [self updateCellLabels];
-    [self updateCellDisplayColor];
-
-    [self.specifier setTarget:self];
-    [self.specifier setButtonAction:@selector(openColorPickerView)];
 }
 
 - (void)openColorPickerView {
@@ -95,23 +106,21 @@
 
 - (UIColor *)previewColor {
 
-    NSString *plistPath = [NSString stringWithFormat:@"/var/mobile/Library/Preferences/%@.plist", [self.specifier propertyForKey:@"defaults"]];
+    NSString *userPrefsPath = [NSString stringWithFormat:@"/User/Library/Preferences/%@.plist", [self.specifier propertyForKey:@"defaults"]];
+    NSString *defaultsPlistPath = [[NSBundle bundleWithPath:[self.specifier propertyForKey:@"defaultsPath"]] pathForResource:@"defaults" ofType:@"plist"];
+    NSString *motuumLSDefaultsPath = [[NSBundle bundleWithPath:@"/Library/PreferenceBundles/motuumLS.bundle"] pathForResource:@"com.creaturesurvive.motuumls_defaults" ofType:@"plist"];
 
-    NSDictionary *prefsDict = [NSDictionary dictionaryWithContentsOfFile:plistPath] ? : [NSDictionary dictionary];
+    NSDictionary *prefsDict = [NSDictionary dictionaryWithContentsOfFile:userPrefsPath] ? : [NSDictionary dictionary];
 
-    NSDictionary *defaultsDict = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle bundleWithPath:[self.specifier propertyForKey:@"defaultsPath"]]
-                                                                             pathForResource:@"defaults"
-                                                                                      ofType:@"plist"]] ? :
-                                 [NSDictionary dictionaryWithContentsOfFile:[[NSBundle bundleWithPath:@"/Library/PreferenceBundles/motuumLS.bundle"]
-                                                                             pathForResource:@"com.creaturesurvive.motuumls_defaults"
-                                                                                      ofType:@"plist"]] ? :
+    NSDictionary *defaultsDict = [NSDictionary dictionaryWithContentsOfFile:defaultsPlistPath] ? :
+                                 [NSDictionary dictionaryWithContentsOfFile:motuumLSDefaultsPath] ? :
                                  [NSDictionary dictionary];
 
 
-    NSString *hex = [prefsDict objectForKey:[self.specifier propertyForKey:@"key"]] ? :          //if default color          //then default color
-                    [defaultsDict objectForKey:[self.specifier propertyForKey:@"key"]] ? :       //if defaults color         //then defaults color
-                    [prefsDict objectForKey:[self.specifier propertyForKey:@"fallback"]] ? :     //else if fallback          //then fallback
-                    @"FF0000)";                                                                             //else red
+    NSString *hex = prefsDict[[self.specifier propertyForKey:@"key"]] ? :
+                    defaultsDict[[self.specifier propertyForKey:@"key"]] ? :
+                    [self.specifier propertyForKey:@"fallback"] ? :
+                    @"FF0000)";
 
     UIColor *color = [UIColor colorFromHexString:hex];
 
@@ -125,5 +134,11 @@
 
     return [super specifier];
 }
+
+// TODO implement this
+// - (void)setValue:(id)value {
+//     [super setValue:value];
+//     [self refreshCellDisplay];
+// }
 
 @end
