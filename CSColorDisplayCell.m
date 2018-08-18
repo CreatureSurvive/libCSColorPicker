@@ -52,7 +52,7 @@
 
 - (void)configureColorDisplay {
     self.cellColorDisplay = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 58, 29)];
-    self.cellColorDisplay.tag = 999;
+    self.cellColorDisplay.tag = 199;
     self.cellColorDisplay.layer.cornerRadius = CGRectGetHeight(self.cellColorDisplay.frame) / 4;
     self.cellColorDisplay.layer.borderWidth = 2;
     self.cellColorDisplay.layer.borderColor = [UIColor lightGrayColor].CGColor;

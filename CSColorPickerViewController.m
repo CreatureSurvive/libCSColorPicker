@@ -353,6 +353,10 @@
     if ([[self.specifier propertyForKey:@"parent"] respondsToSelector:@selector(refreshCellWithSpecifier:)]) {
         [[self.specifier propertyForKey:@"parent"] performSelector:@selector(reloadSettings)];
         [[self.specifier propertyForKey:@"parent"] performSelector:@selector(refreshCellWithSpecifier:) withObject:self.specifier];
+    } 
+    
+    else if ([[self.specifier propertyForKey:@"parent"] respondsToSelector:@selector(reloadSpecifiers)]) {
+        [[self.specifier propertyForKey:@"parent"] performSelector:@selector(reloadSpecifiers)];
     }
 
     if ([self.specifier propertyForKey:@"PostNotification"])
