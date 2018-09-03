@@ -4,13 +4,14 @@
 //
 
 // credits libColorPicker https://github.com/atomikpanda/libcolorpicker/blob/master/PFColorTransparentView.m
-#import "CSColorPickerBackgroundView.h"
+#import <Views/CSColorPickerBackgroundView.h>
 
 @implementation CSColorPickerBackgroundView
 
 - (id)initWithFrame:(CGRect)frame {
     if ((self = [super initWithFrame:frame])) {
         self.gridCount = 10;
+        self.tag = 199;
     }
     return self;
 }

@@ -14,7 +14,7 @@
 // returns a NSString representation of a UIColor in hex format eg [UIColor hexStringFromColor:[UIColor redColor]]; outputs @"#FF0000"
 + (NSString *)hexStringFromColor:(UIColor *)color;
 
-// returns a NSString representation of a UIColor in hex format eg [UIColor hexStringFromColor:[UIColor redColor] alpha:YES]; outputs @"#FF0000FF"
+// returns a NSString representation of a UIColor in hex format eg [UIColor hexStringFromColor:[UIColor redColor] alpha:YES]; outputs @"#FFFF0000"
 + (NSString *)hexStringFromColor:(UIColor *)color alpha:(BOOL)include;
 
 // returns the brightness of the color where black = 0.0 and white = 256.0
@@ -25,7 +25,7 @@
 + (BOOL)isColorLight:(UIColor *)color;
 
 // returns true if the string is a valid hex (will pass with or without #)
-+ (BOOL)isValidHexString:(NSString *)hexStr;
++ (BOOL)isValidHexString:(NSString *)hexString;
 
 // the alpha component the color instance
 - (CGFloat)alpha;
@@ -47,5 +47,14 @@
 
 // the brightness component the color instance
 - (CGFloat)brightness;
+
+// the hexString value of the color instance
+- (NSString *)hexString;
+
+// is this color instance light
+- (BOOL)light;
+
+// is this color instance dark
+- (BOOL)dark;
 
 @end

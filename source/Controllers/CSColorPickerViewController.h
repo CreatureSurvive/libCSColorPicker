@@ -3,17 +3,17 @@
 // Copyright (c) 2018 CreatureCoding. All rights reserved.
 //
 
-#import <Preferences/PSViewController.h>
-#import <Preferences/PSListController.h>
-#import "PSSpecifier.h"
-#import "CSColorSlider.h"
-#import "CSColorDisplayCell.h"
-#import "UIColor+CSColorPicker.h"
-#import "CSColorPickerBackgroundView.h"
+#import <Headers/PSSpecifier.h>
+#import <Controls/CSColorSlider.h>
+#import <Headers/PSViewController.h>
+#import <Cells/CSColorDisplayCell.h>
+#import <Categories/UIColor+CSColorPicker.h>
+#import <Categories/NSString+CSColorPicker.h>
+#import <Views/CSColorPickerBackgroundView.h>
 
-@interface CSPListController : PSViewController
-- (void)refreshCellWithSpecifier:(PSSpecifier *)specifier;
-@end
+// @interface CSPListController : PSViewController
+// - (void)refreshCellWithSpecifier:(PSSpecifier *)specifier;
+// @end
 
 
 @interface CSColorPickerViewController : PSViewController
@@ -35,7 +35,6 @@
 
 @property (nonatomic, assign) BOOL alphaEnabled;
 
-- (id)initForContentSize:(CGSize)size;
 - (void)loadColorPickerView;
 - (void)sliderDidChange:(CSColorSlider *)sender;
 - (BOOL)isLandscape;

@@ -3,10 +3,11 @@
 // Copyright (c) 2018 CreatureCoding. All rights reserved.
 //
 
-#import <CoreFoundation/CoreFoundation.h>
 #import <UIKit/UIKit.h>
-#import "UIColor+CSColorPicker.h"
-#import "NSString+CSColorPicker.h"
+#import <CoreFoundation/CoreFoundation.h>
+
+#import <Categories/UIColor+CSColorPicker.h>
+#import <Categories/NSString+CSColorPicker.h>
 
 #ifdef __cplusplus
 extern "C" {

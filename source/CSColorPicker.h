@@ -3,5 +3,5 @@
 // Copyright (c) 2018 CreatureCoding. All rights reserved.
 //
 
-#import "UIColor+CSColorPicker.h"
-#import "NSString+CSColorPicker.h"
+#import "Controllers/UIColor+CSColorPicker.h"
+#import "Controllers/NSString+CSColorPicker.h"

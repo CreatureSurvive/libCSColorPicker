@@ -3,10 +3,10 @@
 // Copyright (c) 2018 CreatureCoding. All rights reserved.
 //
 
-#import <Preferences/PSViewController.h>
-#import <Preferences/PSTableCell.h>
-#import "CSColorPickerViewController.h"
-#import "PSSpecifier.h"
+#import <Headers/PSSpecifier.h>
+#import <Headers/PSTableCell.h>
+#import <Headers/PSViewController.h>
+#import <Controllers/CSColorPickerViewController.h>
 
 
 @interface CSColorDisplayCell : PSTableCell

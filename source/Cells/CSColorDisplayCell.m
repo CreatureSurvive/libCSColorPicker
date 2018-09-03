@@ -3,16 +3,11 @@
 // Copyright (c) 2018 CreatureCoding. All rights reserved.
 //
 
-#import "CSColorDisplayCell.h"
+#import <Cells/CSColorDisplayCell.h>
 
 // get the associated view controller from a UIView
 // credits https://stackoverflow.com/questions/1372977/given-a-view-how-do-i-get-its-viewcontroller/24590678
-#define UIViewParentController(__view) ({ \
-        UIResponder *__responder = __view; \
-        while ([__responder isKindOfClass:[UIView class]]) \
-            __responder = [__responder nextResponder]; \
-        (UIViewController *)__responder; \
-    })
+#define UIViewParentController(__view) ({ UIResponder *__responder = __view; while ([__responder isKindOfClass:[UIView class]]) __responder = [__responder nextResponder]; (UIViewController *)__responder; })
 
 @implementation CSColorDisplayCell
 @synthesize cellColorDisplay;
@@ -82,7 +77,7 @@
     }
 
 
-    CSColorPickerViewController *colorViewController = [[CSColorPickerViewController alloc] initForContentSize:viewController.view.frame.size];
+    CSColorPickerViewController *colorViewController = [[CSColorPickerViewController alloc] init];
 
     if (self.specifier && [self.specifier propertyForKey:@"defaults"] && [self.specifier propertyForKey:@"key"]) {
 
@@ -105,25 +100,31 @@
 }
 
 - (UIColor *)previewColor {
+    NSString *userPrefsPath, *defaultsPlistPath, *motuumLSDefaultsPath, *hex;
+    NSDictionary *prefsDict, *defaultsDict;
+    UIColor *color;
 
-    NSString *userPrefsPath = [NSString stringWithFormat:@"/User/Library/Preferences/%@.plist", [self.specifier propertyForKey:@"defaults"]];
-    NSString *defaultsPlistPath = [[NSBundle bundleWithPath:[self.specifier propertyForKey:@"defaultsPath"]] pathForResource:@"defaults" ofType:@"plist"];
-    NSString *motuumLSDefaultsPath = [[NSBundle bundleWithPath:@"/Library/PreferenceBundles/motuumLS.bundle"] pathForResource:@"com.creaturesurvive.motuumls_defaults" ofType:@"plist"];
+    userPrefsPath = [NSString stringWithFormat:@"/User/Library/Preferences/%@.plist", [self.specifier propertyForKey:@"defaults"]];
+    defaultsPlistPath = [[NSBundle bundleWithPath:[self.specifier propertyForKey:@"defaultsPath"]] pathForResource:@"defaults" ofType:@"plist"];
+    motuumLSDefaultsPath = [[NSBundle bundleWithPath:@"/Library/PreferenceBundles/motuumLS.bundle"] pathForResource:@"com.creaturesurvive.motuumls_defaults" ofType:@"plist"];
 
-    NSDictionary *prefsDict = [NSDictionary dictionaryWithContentsOfFile:userPrefsPath] ? : [NSDictionary dictionary];
+    if ((prefsDict = [NSDictionary dictionaryWithContentsOfFile:userPrefsPath])) {
+        hex = prefsDict[[self.specifier propertyForKey:@"key"]];
+    }
 
-    NSDictionary *defaultsDict = [NSDictionary dictionaryWithContentsOfFile:defaultsPlistPath] ? :
-                                 [NSDictionary dictionaryWithContentsOfFile:motuumLSDefaultsPath] ? :
-                                 [NSDictionary dictionary];
+    if (!hex && (defaultsDict = [NSDictionary dictionaryWithContentsOfFile:defaultsPlistPath])) {
+        hex = defaultsDict[[self.specifier propertyForKey:@"key"]];
+    }
 
+    if (!hex && (defaultsDict = [NSDictionary dictionaryWithContentsOfFile:motuumLSDefaultsPath])) {
+        hex = defaultsDict[[self.specifier propertyForKey:@"key"]];
+    }
 
-    NSString *hex = prefsDict[[self.specifier propertyForKey:@"key"]] ? :
-                    defaultsDict[[self.specifier propertyForKey:@"key"]] ? :
-                    [self.specifier propertyForKey:@"fallback"] ? :
-                    @"FF0000)";
+    if (!hex) {
+        hex = [self.specifier propertyForKey:@"fallback"] ? : @"FF0000)";
+    }
 
-    UIColor *color = [UIColor colorFromHexString:hex];
-
+    color = [UIColor colorFromHexString:hex];    
     [self.specifier setProperty:hex forKey:@"hexValue"];
     [self.specifier setProperty:color forKey:@"color"];
 

@@ -3,7 +3,7 @@
 // Copyright (c) 2018 CreatureCoding. All rights reserved.
 //
 
-#import "CSColorSlider.h"
+#import <Controls/CSColorSlider.h>
 
 @interface CSColorSlider ()
 

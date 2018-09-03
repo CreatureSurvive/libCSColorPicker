@@ -3,8 +3,8 @@
 // Copyright (c) 2018 CreatureCoding. All rights reserved.
 //
 
-#import <CoreGraphics/CoreGraphics.h>
 #import <UIKit/UIKit.h>
+#import <CoreGraphics/CoreGraphics.h>
 
 @interface CSColorPickerBackgroundView : UIView
 @property (nonatomic, assign) CGFloat gridCount;

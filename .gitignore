@@ -22,5 +22,5 @@ Thumbs.db
 
 obj/
 _/
-packages
-.theos
+packages/
+.theos/
