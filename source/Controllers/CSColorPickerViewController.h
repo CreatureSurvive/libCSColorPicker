@@ -11,10 +11,9 @@
 #import <Categories/NSString+CSColorPicker.h>
 #import <Views/CSColorPickerBackgroundView.h>
 
-// @interface CSPListController : PSViewController
-// - (void)refreshCellWithSpecifier:(PSSpecifier *)specifier;
-// @end
-
+@interface NSUserDefaults (Private)
+- (void)setObject:(id)object forKey:(NSString *)key inDomain:(NSString *)domain;
+@end
 
 @interface CSColorPickerViewController : PSViewController
 

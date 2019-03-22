@@ -25,12 +25,17 @@
 - (void)refreshCellContentsWithSpecifier:(PSSpecifier *)specifier {
     [super refreshCellContentsWithSpecifier:specifier];
 
-    [self refreshCellDisplay];
+    [self refreshCellWithColor:nil];
 }
 
-- (void)refreshCellDisplay {
-    [self updateCellLabels];
-    [self updateCellDisplayColor];
+- (void)refreshCellWithColor:(UIColor *)color {
+	
+	if (!color) {
+		color = [self previewColor];
+	}
+	
+	self.cellColorDisplay.backgroundColor = color;
+	self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", [color hexString]];
 }
 
 - (void)didMoveToSuperview {
@@ -91,7 +96,7 @@
 }
 
 - (void)updateCellLabels {
-    self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", [UIColor hexStringFromColor:[self previewColor]]];
+    self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", [[self previewColor] hexString]];
     self.detailTextLabel.alpha = 0.65;
 }
 

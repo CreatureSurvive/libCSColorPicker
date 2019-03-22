@@ -15,9 +15,9 @@
 @property (nonatomic, retain) NSMutableDictionary *options;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)identifier specifier:(PSSpecifier *)specifier;
-- (void)refreshCellDisplay;
 - (void)updateCellLabels;
 - (void)updateCellDisplayColor;
+- (void)refreshCellWithColor:(UIColor *)color;
 
 - (void)openColorPickerView;
 

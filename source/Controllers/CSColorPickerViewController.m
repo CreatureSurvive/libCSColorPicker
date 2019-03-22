@@ -52,9 +52,12 @@
     // create views
     CGRect bounds = self.view.bounds;
     UIEdgeInsets insets = UIEdgeInsetsZero;
-    if (@available(iOS 11, *)) {
+	if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 11.0) {
         if ([self.view respondsToSelector:@selector(safeAreaInsets)]) {
+			#pragma clang diagnostic push
+			#pragma clang diagnostic ignored "-Wunguarded-availability-new"
             insets = [self.view safeAreaInsets];
+			#pragma clang diagnostic pop
             insets.top = 0;
             bounds = UIEdgeInsetsInsetRect(self.view.bounds, insets);
         }
@@ -168,7 +171,7 @@
         self.colorPickerPreviewView.backgroundColor = color;
 
         [self setColorInformationTextWithInformationFromColor:color];
-        [self.specifier setValue:[NSString stringWithFormat:@"%@:%f", [UIColor hexStringFromColor:color], color.alpha] forKey:@"hexValue"];
+        [self.specifier setValue:[NSString stringWithFormat:@"%@:%f", [color hexString], color.alpha] forKey:@"hexValue"];
     } @catch (NSException *e) {
         CSError(@"%@", e.description);
     }
@@ -199,7 +202,7 @@
                                                                       preferredStyle:UIAlertControllerStyleAlert];
 
     [alertController addTextFieldWithConfigurationHandler:^(UITextField *hexField) {
-        hexField.text = [NSString stringWithFormat:@"#%@", [UIColor hexStringFromColor:[self colorForHSBSliders]]];
+        hexField.text = [NSString stringWithFormat:@"#%@", [[self colorForHSBSliders] hexString]];
         hexField.textColor = [UIColor blackColor];
         hexField.clearButtonMode = UITextFieldViewModeAlways;
         hexField.borderStyle = UITextBorderStyleRoundedRect;
@@ -230,31 +233,40 @@
 
 - (void)saveColor {
 
-    NSString *plistPath = [NSString stringWithFormat:@"/User/Library/Preferences/%@.plist", [self.specifier propertyForKey:@"defaults"]];
-    NSMutableDictionary *prefsDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistPath] ? : [NSMutableDictionary new];
     NSString *color = [UIColor hexStringFromColor:[self colorForRGBSliders] alpha:YES];
+	NSString *key = [self.specifier propertyForKey:@"key"];
+	NSString *defaults = [self.specifier propertyForKey:@"defaults"];
 
-    if (!prefsDict) prefsDict = [NSMutableDictionary dictionary];
-    [prefsDict setObject:color forKey:[self.specifier propertyForKey:@"key"]];
+    NSString *plistPath = [NSString stringWithFormat:@"/User/Library/Preferences/%@.plist", defaults];
+    NSMutableDictionary *prefsDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistPath] ? : [NSMutableDictionary new];
+	CSColorDisplayCell *cell = (CSColorDisplayCell *)[self.specifier propertyForKey:@"cellObject"];
+	
+    // save via plist
+    [prefsDict setObject:color forKey:key];
     [prefsDict writeToFile:plistPath atomically:NO];
 
-    CFPreferencesSetValue((__bridge CFStringRef)[self.specifier propertyForKey:@"key"], (__bridge CFPropertyListRef)color, (__bridge CFStringRef)[self.specifier propertyForKey:@"defaults"], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
-    CFPreferencesSynchronize((__bridge CFStringRef)[self.specifier propertyForKey:@"defaults"], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+    // save in CFPreferences
+    CFPreferencesSetValue((__bridge CFStringRef)key, (__bridge CFPropertyListRef)color, (__bridge CFStringRef)defaults, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+    CFPreferencesSynchronize((__bridge CFStringRef)defaults, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 
+    // save in domain for NSUserDefaults
+	[[NSUserDefaults standardUserDefaults] setObject:color forKey:key inDomain:defaults];
+	
+	if (cell)
+		[cell refreshCellWithColor:[self colorForRGBSliders]];
+		
     if ([self.specifier propertyForKey:@"PostNotification"])
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
                                              (CFStringRef)[self.specifier propertyForKey:@"PostNotification"],
                                              (CFStringRef)[self.specifier propertyForKey:@"PostNotification"],
                                              NULL,
                                              YES);
-
-    if ([[self.specifier propertyForKey:@"parent"] respondsToSelector:@selector(refreshCellWithSpecifier:)]) {
-        [[self.specifier propertyForKey:@"parent"] performSelector:@selector(reloadSettings)];
-        [[self.specifier propertyForKey:@"parent"] performSelector:@selector(refreshCellWithSpecifier:) withObject:self.specifier];
-    } 
-    
-    else if ([[self.specifier propertyForKey:@"parent"] respondsToSelector:@selector(reloadSpecifier:)]) {
-        [[self.specifier propertyForKey:@"parent"] performSelector:@selector(reloadSpecifier:) withObject:self.specifier];
+	
+    if ([self.specifier propertyForKey:@"callbackAction"]) {
+        SEL callback = NSSelectorFromString([self.specifier propertyForKey:@"callbackAction"]);
+        if ([self.specifier.target respondsToSelector:callback]) {
+            ((void (*)(id, SEL))[self.specifier.target methodForSelector:callback])(self.specifier.target, callback);
+        }
     }
 }
 
@@ -265,14 +277,14 @@
     [color getRed:&r green:&g blue:&bb alpha:&aa];
     if (wide) {
         if (self.alphaEnabled) {
-            return [NSString stringWithFormat:@"#%@\n\nR: %.f       H: %.f\nG: %.f       S: %.f\nB: %.f       B: %.f\nA: %.f       A: %.f", [UIColor hexStringFromColor:color], r * 255, h * 360, g * 255, s * 100, bb * 255, b * 100, aa * 100, a * 100];
+            return [NSString stringWithFormat:@"#%@\n\nR: %.f       H: %.f\nG: %.f       S: %.f\nB: %.f       B: %.f\nA: %.f       A: %.f", [color hexString], r * 255, h * 360, g * 255, s * 100, bb * 255, b * 100, aa * 100, a * 100];
         }
-        return [NSString stringWithFormat:@"#%@\n\nR: %.f       H: %.f\nG: %.f       S: %.f\nB: %.f       B: %.f", [UIColor hexStringFromColor:color], r * 255, h * 360, g * 255, s * 100, bb * 255, b * 100];
+        return [NSString stringWithFormat:@"#%@\n\nR: %.f       H: %.f\nG: %.f       S: %.f\nB: %.f       B: %.f", [color hexString], r * 255, h * 360, g * 255, s * 100, bb * 255, b * 100];
     } else {
         if (self.alphaEnabled) {
-            return [NSString stringWithFormat:@"#%@\n\nR: %.f\nG: %.f\nB: %.f\nA: %.f\n\nH: %.f\nS: %.f\nB: %.f\nA: %.f", [UIColor hexStringFromColor:color], r * 255, g * 255, bb * 255, aa * 100, h * 360, s * 100, b * 100, a * 100];
+            return [NSString stringWithFormat:@"#%@\n\nR: %.f\nG: %.f\nB: %.f\nA: %.f\n\nH: %.f\nS: %.f\nB: %.f\nA: %.f", [color hexString], r * 255, g * 255, bb * 255, aa * 100, h * 360, s * 100, b * 100, a * 100];
         }
-        return [NSString stringWithFormat:@"#%@\n\nR: %.f\nG: %.f\nB: %.f\n\nH: %.f\nS: %.f\nB: %.f", [UIColor hexStringFromColor:color], r * 255, g * 255, bb * 255, h * 360, s * 100, b * 100];
+        return [NSString stringWithFormat:@"#%@\n\nR: %.f\nG: %.f\nB: %.f\n\nH: %.f\nS: %.f\nB: %.f", [color hexString], r * 255, g * 255, bb * 255, h * 360, s * 100, b * 100];
     }
 }
 
