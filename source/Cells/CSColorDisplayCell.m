@@ -5,6 +5,8 @@
 
 #import <Cells/CSColorDisplayCell.h>
 
+#import <simulator.h>
+
 // get the associated view controller from a UIView
 // credits https://stackoverflow.com/questions/1372977/given-a-view-how-do-i-get-its-viewcontroller/24590678
 #define UIViewParentController(__view) ({ UIResponder *__responder = __view; while ([__responder isKindOfClass:[UIView class]]) __responder = [__responder nextResponder]; (UIViewController *)__responder; })
@@ -29,11 +31,11 @@
 }
 
 - (void)refreshCellWithColor:(UIColor *)color {
-	
+
 	if (!color) {
 		color = [self previewColor];
 	}
-	
+
 	self.cellColorDisplay.backgroundColor = color;
 	self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", [color hexString]];
 }
@@ -109,9 +111,9 @@
     NSDictionary *prefsDict, *defaultsDict;
     UIColor *color;
 
-    userPrefsPath = [NSString stringWithFormat:@"/User/Library/Preferences/%@.plist", [self.specifier propertyForKey:@"defaults"]];
-    defaultsPlistPath = [[NSBundle bundleWithPath:[self.specifier propertyForKey:@"defaultsPath"]] pathForResource:@"defaults" ofType:@"plist"];
-    motuumLSDefaultsPath = [[NSBundle bundleWithPath:@"/Library/PreferenceBundles/motuumLS.bundle"] pathForResource:@"com.creaturesurvive.motuumls_defaults" ofType:@"plist"];
+    userPrefsPath = rPath([NSString stringWithFormat:@"/User/Library/Preferences/%@.plist", [self.specifier propertyForKey:@"defaults"]]);
+    defaultsPlistPath = rPath([[NSBundle bundleWithPath:[self.specifier propertyForKey:@"defaultsPath"]] pathForResource:@"defaults" ofType:@"plist"]);
+    motuumLSDefaultsPath = rPath([[NSBundle bundleWithPath:@"/Library/PreferenceBundles/motuumLS.bundle"] pathForResource:@"com.creaturesurvive.motuumls_defaults" ofType:@"plist"]);
 
     if ((prefsDict = [NSDictionary dictionaryWithContentsOfFile:userPrefsPath])) {
         hex = prefsDict[[self.specifier propertyForKey:@"key"]];
@@ -129,7 +131,7 @@
         hex = [self.specifier propertyForKey:@"fallback"] ? : @"FF0000)";
     }
 
-    color = [UIColor colorFromHexString:hex];    
+    color = [UIColor colorFromHexString:hex];
     [self.specifier setProperty:hex forKey:@"hexValue"];
     [self.specifier setProperty:color forKey:@"color"];
 

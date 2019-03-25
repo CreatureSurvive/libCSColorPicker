@@ -5,6 +5,8 @@
 
 #import <Controllers/CSColorPickerViewController.h>
 
+#import <simulator.h>
+
 @implementation CSColorPickerViewController
 
 - (void)viewDidLoad {
@@ -173,7 +175,7 @@
         [self setColorInformationTextWithInformationFromColor:color];
         [self.specifier setValue:[NSString stringWithFormat:@"%@:%f", [color hexString], color.alpha] forKey:@"hexValue"];
     } @catch (NSException *e) {
-        CSError(@"%@", e.description);
+        //CSError(@"%@", e.description);
     }
 }
 
@@ -237,10 +239,10 @@
 	NSString *key = [self.specifier propertyForKey:@"key"];
 	NSString *defaults = [self.specifier propertyForKey:@"defaults"];
 
-    NSString *plistPath = [NSString stringWithFormat:@"/User/Library/Preferences/%@.plist", defaults];
+    NSString *plistPath = rPath([NSString stringWithFormat:@"/User/Library/Preferences/%@.plist", defaults]);
     NSMutableDictionary *prefsDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistPath] ? : [NSMutableDictionary new];
 	CSColorDisplayCell *cell = (CSColorDisplayCell *)[self.specifier propertyForKey:@"cellObject"];
-	
+
     // save via plist
     [prefsDict setObject:color forKey:key];
     [prefsDict writeToFile:plistPath atomically:NO];
@@ -251,17 +253,17 @@
 
     // save in domain for NSUserDefaults
 	[[NSUserDefaults standardUserDefaults] setObject:color forKey:key inDomain:defaults];
-	
+
 	if (cell)
 		[cell refreshCellWithColor:[self colorForRGBSliders]];
-		
+
     if ([self.specifier propertyForKey:@"PostNotification"])
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
                                              (CFStringRef)[self.specifier propertyForKey:@"PostNotification"],
                                              (CFStringRef)[self.specifier propertyForKey:@"PostNotification"],
                                              NULL,
                                              YES);
-	
+
     if ([self.specifier propertyForKey:@"callbackAction"]) {
         SEL callback = NSSelectorFromString([self.specifier propertyForKey:@"callbackAction"]);
         if ([self.specifier.target respondsToSelector:callback]) {
