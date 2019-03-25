@@ -4,7 +4,7 @@ make SIMULATOR=1
 
 THEOS_OBJ_DIR=./.theos/obj/iphone_simulator
 
-#install PreferenceBundle into all additionally installed simulators
+#install libCSColorPicker into all additionally installed simulators
 
 for runtime in /Library/Developer/CoreSimulator/Profiles/Runtimes/*
 do
@@ -19,7 +19,7 @@ do
   fi
 done
 
-#install PreferenceBundle into the simulator that ships with Xcode
+#install libCSColorPicker into the simulator that ships with Xcode
 
 echo "Installing libCSColorPicker to /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/CoreSimulator/Profiles/Runtimes/iOS.simruntime"
 
