@@ -175,7 +175,7 @@
         [self setColorInformationTextWithInformationFromColor:color];
         [self.specifier setValue:[NSString stringWithFormat:@"%@:%f", [color hexString], color.alpha] forKey:@"hexValue"];
     } @catch (NSException *e) {
-        //CSError(@"%@", e.description);
+        CSError(@"%@", e.description);
     }
 }
 
