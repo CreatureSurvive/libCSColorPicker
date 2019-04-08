@@ -3,20 +3,22 @@
 // Copyright (c) 2018 CreatureCoding. All rights reserved.
 //
 
-#import <Cells/CSColorDisplayCell.h>
+#import <Cells/CSGradientDisplayCell.h>
 
 // get the associated view controller from a UIView
 // credits https://stackoverflow.com/questions/1372977/given-a-view-how-do-i-get-its-viewcontroller/24590678
 #define UIViewParentController(__view) ({ UIResponder *__responder = __view; while ([__responder isKindOfClass:[UIView class]]) __responder = [__responder nextResponder]; (UIViewController *)__responder; })
 
-@implementation CSColorDisplayCell
-@synthesize cellColorDisplay;
+@implementation CSGradientDisplayCell
+@synthesize cellColorDisplay, gradient;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)identifier specifier:(PSSpecifier *)specifier {
 
     if ((self = [super initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier specifier:specifier])) {
         [specifier setTarget:self];
         [specifier setButtonAction:@selector(openColorPickerView)];
+        [specifier setProperty:@(YES) forKey:@"gradient"];
+        self.detailTextLabel.alpha = 0.65;
     }
 
     return self;
@@ -25,17 +27,29 @@
 - (void)refreshCellContentsWithSpecifier:(PSSpecifier *)specifier {
     [super refreshCellContentsWithSpecifier:specifier];
 
-    [self refreshCellWithColor:nil];
+    [self refreshCellWithColors:nil];
 }
 
-- (void)refreshCellWithColor:(UIColor *)color {
+- (void)refreshCellWithColors:(NSArray<UIColor *> *)newColors {
 	
-	if (!color) {
-		color = [self previewColor];
+	if (!newColors) {
+		newColors = [self previewColors];
 	}
 	
-	self.cellColorDisplay.backgroundColor = color;
-	self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", [color hexString]];
+    self.detailTextLabel.text = nil;
+	NSMutableArray<id> *colors = [NSMutableArray new];
+    for (UIColor *color in newColors) {
+        if (self.detailTextLabel.text)
+            self.detailTextLabel.text = [self.detailTextLabel.text stringByAppendingFormat:@", #%@", color.hexString];
+        else self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", color.hexString];
+        [colors addObject:(id)color.CGColor];
+    }
+
+    if (colors.count == 1) {
+        [colors addObject:colors.firstObject];
+    }
+
+    self.gradient.colors = colors;
 }
 
 - (void)didMoveToSuperview {
@@ -46,8 +60,7 @@
     [super didMoveToSuperview];
 
     [self configureColorDisplay];
-    [self updateCellLabels];
-    [self updateCellDisplayColor];
+    [self refreshCellWithColors:nil];
 }
 
 - (void)configureColorDisplay {
@@ -56,6 +69,14 @@
     self.cellColorDisplay.layer.cornerRadius = CGRectGetHeight(self.cellColorDisplay.frame) / 4;
     self.cellColorDisplay.layer.borderWidth = 2;
     self.cellColorDisplay.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    
+    self.gradient = [CAGradientLayer layer];
+    self.gradient.frame = self.cellColorDisplay.bounds;
+    self.gradient.cornerRadius = self.cellColorDisplay.layer.cornerRadius;
+    self.gradient.startPoint = CGPointMake(0, 0.5);
+    self.gradient.endPoint = CGPointMake(1, 0.5);
+    
+    [self.cellColorDisplay.layer addSublayer:self.gradient];
     [self setAccessoryView:self.cellColorDisplay];
 }
 
@@ -95,56 +116,41 @@
     [viewController.navigationController pushViewController:colorViewController animated:YES];
 }
 
-- (void)updateCellLabels {
-    self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", [[self previewColor] hexString]];
-    self.detailTextLabel.alpha = 0.65;
-}
-
-- (void)updateCellDisplayColor {
-    self.cellColorDisplay.backgroundColor = [self previewColor];
-}
-
-- (UIColor *)previewColor {
-    NSString *userPrefsPath, *defaultsPlistPath, *motuumLSDefaultsPath, *hex;
+- (NSArray<UIColor *> *)previewColors {
+    NSString *userPrefsPath, *defaultsPlistPath, *hexs;
     NSDictionary *prefsDict, *defaultsDict;
-    UIColor *color;
+    NSMutableArray<UIColor *> *colors = [NSMutableArray new];
 
-    userPrefsPath = [NSString stringWithFormat:@"/User/Library/Preferences/%@.plist", [self.specifier propertyForKey:@"defaults"]];
+    userPrefsPath = [NSString stringWithFormat:@"/var/mobile/Library/Preferences/%@.plist", [self.specifier propertyForKey:@"defaults"]];
     defaultsPlistPath = [[NSBundle bundleWithPath:[self.specifier propertyForKey:@"defaultsPath"]] pathForResource:@"defaults" ofType:@"plist"];
-    motuumLSDefaultsPath = [[NSBundle bundleWithPath:@"/Library/PreferenceBundles/motuumLS.bundle"] pathForResource:@"com.creaturesurvive.motuumls_defaults" ofType:@"plist"];
 
     if ((prefsDict = [NSDictionary dictionaryWithContentsOfFile:userPrefsPath])) {
-        hex = prefsDict[[self.specifier propertyForKey:@"key"]];
+        hexs = prefsDict[[self.specifier propertyForKey:@"key"]];
     }
 
-    if (!hex && (defaultsDict = [NSDictionary dictionaryWithContentsOfFile:defaultsPlistPath])) {
-        hex = defaultsDict[[self.specifier propertyForKey:@"key"]];
+    if (!hexs && (defaultsDict = [NSDictionary dictionaryWithContentsOfFile:defaultsPlistPath])) {
+        hexs = defaultsDict[[self.specifier propertyForKey:@"key"]];
     }
 
-    if (!hex && (defaultsDict = [NSDictionary dictionaryWithContentsOfFile:motuumLSDefaultsPath])) {
-        hex = defaultsDict[[self.specifier propertyForKey:@"key"]];
+    if (!hexs) {
+        hexs = [self.specifier propertyForKey:@"fallback"] ? : @"FF0000,FFFFFF";
     }
 
-    if (!hex) {
-        hex = [self.specifier propertyForKey:@"fallback"] ? : @"FF0000";
+    for (NSString *hex in [hexs componentsSeparatedByString:@","]) {
+        [colors addObject:[hex hexColor]];
     }
 
-    color = [UIColor colorFromHexString:hex];    
-    [self.specifier setProperty:hex forKey:@"hexValue"];
-    [self.specifier setProperty:color forKey:@"color"];
+    if (colors.count < 2) [colors addObject:UIColor.redColor];
+    [self.specifier setProperty:colors.lastObject.hexString forKey:@"hexValue"];
+    [self.specifier setProperty:colors.lastObject forKey:@"color"];
+    [self.specifier setProperty:colors forKey:@"colors"];
 
-    return color;
+    return colors;
 }
 
 - (PSSpecifier *)specifier {
 
     return [super specifier];
 }
-
-// TODO implement this
-// - (void)setValue:(id)value {
-//     [super setValue:value];
-//     [self refreshCellDisplay];
-// }
 
 @end

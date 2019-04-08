@@ -56,7 +56,7 @@ Now lets take a look at the usage within your your Tweak.xm
 // lets set up a simple means of fetching values from out preferences
 // NOTE: this is just an example, you should cache the preference dictionary 
 // if you plan to use this in a tweak
-inline NSString *GetHexStringForPrefernceKey(NSString *key) {
+inline NSString *StringForPreferenceKey(NSString *key) {
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:PLIST_PATH] ? : [NSDictionary new];
     return prefs[key];
 }
@@ -65,10 +65,10 @@ inline NSString *GetHexStringForPrefernceKey(NSString *key) {
 
 // lets change the background color of MyAwsomeView using the color set in our preferences
 - (void)setBackgroundColor:(UIColor *)color {
-	// libCSColorPicker extendes the UIColor class so that usage is fimilar
+	// libCSColorPicker extendes the UIColor class so that usage is familiar
 	// you can also use the C method hexStringFromColor(UIColor *color);
-    color = [UIColor colorFromHexString:GetHexStringForPrefernceKey(@"k_myAwesomeBackgroundColor)];
-   
+    color = [UIColor colorFromHexString:StringForPreferenceKey(@"k_myAwesomeBackgroundColor)];
+
    // lets see what else we can do with libCSColorPicker
    // outputs FF0000 assuming out color is red
    NSString *hex = [UIColor hexStringFromColor:color];
@@ -82,6 +82,27 @@ inline NSString *GetHexStringForPrefernceKey(NSString *key) {
    
    // we can also validate our hex string if we need 
    BOOL valid = [UIColor isValidHexString:@"FFFFFF"];
+}
+
+- (void)setGradienView {
+	// get an array of CGColors from a preference value, the value is a comma separated string of hex colors eg" FFFFFF,000000,111111
+	NSArray<id> *gradientColors = [StringForPreferenceKey(@"k_myAwesomeBackgroundGradient) gradientStringCGColors];
+
+	CAGradientLayer *gradient = [CAGradientLayer layer];
+    gradient.frame = self.view.bounds;
+
+	// left to right gradient
+    gradient.startPoint = CGPointMake(0, 0.5);
+    gradient.endPoint = CGPointMake(1, 0.5);
+
+	// set the gradient colors
+	gradient.colors = gradientColors;
+
+	// add the gradient to the view
+	[self.view addSublayer:gradient];
+
+	// if upi need an array of UIColors instead of CGColors use:
+	NSArray<UIColor *> ui_colors = [StringForPreferenceKey(@"k_myAwesomeBackgroundGradient) gradientStringColors]; 
 }
 
 %end
@@ -127,6 +148,8 @@ internal-stage::
 		
 		<key>items</key>
 		<array>
+
+			<!-- color cell specifier -->
 			<dict>
 				<key>PostNotification</key>
 				<string>com.creaturecoding.MyAwsomeTweak.prefsChanged</string> 
@@ -147,9 +170,49 @@ internal-stage::
 				<key>alpha</key>
 				<false/>
 			</dict>
+
+			<!-- gradient cell specifier -->
+			<dict>
+				<key>PostNotification</key>
+				<string>com.creaturecoding.MyAwsomeTweak.prefsChanged</string> 
+				<key>cell</key>
+				<string>PSLinkCell</string>
+				<key>cellClass</key>
+				<string>CSGradientDisplayCell</string>
+				<key>defaults</key>
+				<string>com.creaturecoding.MyAwsomeTweak</string>
+				<key>defaultsPath</key>
+				<string>/Library/PreferenceBundles/MyAwesomeTweak.bundle</string>
+				<key>key</key>
+				<string>k_myAwesomeBackgroundGradient</string>
+				<key>label</key>
+				<string>My Awsome Background Gradient</string>
+                <key>fallback</key>
+                <string>FFFFFF,000000</string>
+				<key>alpha</key>
+				<false/>
+			</dict>
 		</array>
 	</dict>
 </plist>
+```
+
+if you want to use defaultsPath instead of fallback to set default colors, then create a plist named `defaults.plist` in your preferences Resource folder and add an entry for each color like so:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<!-- default color for key -->
+		<key>k_myAwesomeBackgroundColor</key>
+		<string>FFFFFF</string>
+
+		<!-- default gradient for key -->
+		<key>k_myAwesomeBackgroundGradient</key>
+		<string>FFFFFF,000000</string>
+	</dict>
+</plis
 ```
 
 

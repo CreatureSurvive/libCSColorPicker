@@ -20,4 +20,12 @@
 // returns true if the string instance is a valid hex value
 - (BOOL)validHex;
 
+// returns an array of UIColors from a gradient hex array 
+// eg: @"FF0000,00FF00,0000FF", or @"FF0000:0.500000,00FF00:0.500000,0000FF:0.500000" or @"FFFF0000,FF00FF00,FF0000FF"
+- (NSArray<UIColor *> *)gradientStringColors;
+
+// returns an array of CGColors for setting CAGradientLayer.colors property
+// same usage as gradientStringColors
+- (NSArray<id> *)gradientStringCGColors;
+
 @end

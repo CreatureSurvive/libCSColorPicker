@@ -7,9 +7,11 @@
 #import <Controls/CSColorSlider.h>
 #import <Headers/PSViewController.h>
 #import <Cells/CSColorDisplayCell.h>
+#import <Cells/CSGradientDisplayCell.h>
 #import <Categories/UIColor+CSColorPicker.h>
 #import <Categories/NSString+CSColorPicker.h>
 #import <Views/CSColorPickerBackgroundView.h>
+#import <Views/CSGradientSelection.h>
 
 @interface NSUserDefaults (Private)
 - (void)setObject:(id)object forKey:(NSString *)key inDomain:(NSString *)domain;
@@ -22,6 +24,7 @@
 @property (nonatomic, strong) UIImageView *colorTrackImageView;
 @property (nonatomic, strong) CSColorPickerBackgroundView *colorPickerBackgroundView;
 @property (nonatomic, strong) UIView *colorPickerPreviewView;
+@property (nonatomic, strong) CSGradientSelection *gradientSelection;
 
 @property (nonatomic, retain) CSColorSlider *colorPickerHueSlider;
 @property (nonatomic, retain) CSColorSlider *colorPickerSaturationSlider;
@@ -33,6 +36,9 @@
 @property (nonatomic, retain) CSColorSlider *colorPickerBlueSlider;
 
 @property (nonatomic, assign) BOOL alphaEnabled;
+@property (nonatomic, assign) BOOL isGradient;
+@property (nonatomic, assign) NSInteger selectedIndex;
+@property (nonatomic, retain) NSMutableArray<UIColor *> *colors;
 
 - (void)loadColorPickerView;
 - (void)sliderDidChange:(CSColorSlider *)sender;

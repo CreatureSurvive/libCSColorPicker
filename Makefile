@@ -1,5 +1,5 @@
-ARCHS = armv7 armv7s arm64
-TARGET = iphone:clang:11.2:9.0
+ARCHS = armv7 armv7s arm64 arm64e
+TARGET = iphone:clang:11.2:7.0
 
 GO_EASY_ON_ME = 0
 FINALPACKAGE = 1

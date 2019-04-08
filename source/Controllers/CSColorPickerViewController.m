@@ -21,7 +21,7 @@
     [super viewDidAppear:animated];
 
     // animate in
-    [UIView animateWithDuration:0.5 animations:^{
+    [UIView animateWithDuration:0.3 animations:^{
         self.colorPickerContainerView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
         self.colorPickerPreviewView.backgroundColor = [self startColor];
     }];
@@ -63,12 +63,23 @@
         }
     }
 
-    self.alphaEnabled = ([self.specifier propertyForKey:@"alpha"] && ![[self.specifier propertyForKey:@"alpha"] boolValue]) ? NO : YES;
+    self.alphaEnabled = ([self.specifier propertyForKey:@"alpha"] && [[self.specifier propertyForKey:@"alpha"] boolValue]);
+    self.isGradient = ([self.specifier propertyForKey:@"gradient"] && [[self.specifier propertyForKey:@"gradient"] boolValue]);
 
     self.colorPickerContainerView = [[UIView alloc] initWithFrame:bounds];
     self.colorPickerBackgroundView = [[CSColorPickerBackgroundView alloc] initWithFrame:bounds];
     self.colorPickerPreviewView = [[UIView alloc] initWithFrame:bounds];
     self.colorPickerPreviewView.tag = 199;
+
+    if (self.isGradient) {
+        self.colors = [self.specifier propertyForKey:@"colors"];
+        self.selectedIndex = self.colors.count - 1;
+        self.gradientSelection = [[CSGradientSelection alloc] initWithSize:CGSizeZero target:self addAction:@selector(addAction:) removeAction:@selector(removeAction:) selectAction:@selector(selectAction:)];
+        [self.gradientSelection setTranslatesAutoresizingMaskIntoConstraints:NO];
+        [self.colorPickerContainerView addSubview:self.gradientSelection];
+
+        [self.gradientSelection addColors:self.colors];
+    }
 
     self.colorInformationLable = [[UILabel alloc] initWithFrame:CGRectZero];
     [self.colorInformationLable setNumberOfLines:self.alphaEnabled ? 11 : 9];
@@ -132,7 +143,7 @@
 
 - (void)sliderDidChange:(CSColorSlider *)sender {
     UIColor *color = (sender.sliderType > 2) ? [self colorForRGBSliders] : [self colorForHSBSliders];
-    [self setColor:color];
+    [self updateColor:color];
 }
 
 - (UIColor *)colorForHSBSliders {
@@ -147,6 +158,14 @@
                            green:self.colorPickerGreenSlider.value
                             blue:self.colorPickerBlueSlider.value
                            alpha:self.colorPickerAlphaSlider.value];
+}
+
+- (void)updateColor:(UIColor *)color {
+    [self setColor:color];
+    if (self.isGradient) {
+        self.colors[self.selectedIndex] = color;
+        [self.gradientSelection setColor:color atIndex:self.selectedIndex];
+    }
 }
 
 - (void)setColor:(UIColor *)color {
@@ -171,7 +190,7 @@
         self.colorPickerPreviewView.backgroundColor = color;
 
         [self setColorInformationTextWithInformationFromColor:color];
-        [self.specifier setValue:[NSString stringWithFormat:@"%@:%f", [color hexString], color.alpha] forKey:@"hexValue"];
+
     } @catch (NSException *e) {
         CSError(@"%@", e.description);
     }
@@ -213,12 +232,10 @@
     }]];
 
     [alertController addAction:[UIAlertAction actionWithTitle:@"Set Color" style:UIAlertActionStyleDefault handler:^(UIAlertAction *set) {
-        [self setColor:[UIColor colorFromHexString:alertController.textFields[0].text]];
-
+        [self updateColor:[UIColor colorFromHexString:alertController.textFields[0].text]];
     }]];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Set From PasteBoard" style:UIAlertActionStyleDefault handler:^(UIAlertAction *set) {
-        [self setColor:[UIColor colorFromHexString:[UIPasteboard generalPasteboard].string]];
-
+        [self updateColor:[UIColor colorFromHexString:[UIPasteboard generalPasteboard].string]];
     }]];
 
     [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
@@ -228,32 +245,60 @@
 }
 
 - (UIColor *)startColor {
-    return [UIColor colorFromHexString:[self.specifier propertyForKey:@"hexValue"]];
+    return self.isGradient ? self.colors.lastObject : [UIColor colorFromHexString:[self.specifier propertyForKey:@"hexValue"]];
+}
+
+- (void)addAction:(UIButton *)sender {
+    [self.colors addObject:UIColor.redColor];
+    [self.gradientSelection addColor:UIColor.redColor];
+    [self setColor:self.colors.lastObject];
+    self.selectedIndex = self.colors.count - 1;
+}
+
+- (void)removeAction:(UIButton *)sender {
+    [self.colors removeObjectAtIndex:self.selectedIndex];
+    [self.gradientSelection removeColorAtIndex:self.selectedIndex];
+    [self setColor:self.colors.lastObject];
+    self.selectedIndex = self.colors.count - 1;
+}
+
+- (void)selectAction:(UIButton *)sender {
+    [self setColor:self.colors[sender.tag]];
+    self.selectedIndex = sender.tag;
 }
 
 - (void)saveColor {
+    NSString *saveValue = nil;
+    if (self.isGradient) {
+        for (UIColor *color in self.colors) {
+            saveValue = saveValue ? [saveValue stringByAppendingFormat:@",%@", color.hexString] : [NSString stringWithFormat:@"%@", color.hexString];
+        }
+    } else {
+        saveValue = [UIColor hexStringFromColor:[self colorForRGBSliders] alpha:YES];
+    }
 
-    NSString *color = [UIColor hexStringFromColor:[self colorForRGBSliders] alpha:YES];
 	NSString *key = [self.specifier propertyForKey:@"key"];
 	NSString *defaults = [self.specifier propertyForKey:@"defaults"];
 
     NSString *plistPath = [NSString stringWithFormat:@"/User/Library/Preferences/%@.plist", defaults];
     NSMutableDictionary *prefsDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistPath] ? : [NSMutableDictionary new];
-	CSColorDisplayCell *cell = (CSColorDisplayCell *)[self.specifier propertyForKey:@"cellObject"];
+	UITableViewCell *cell = [self.specifier propertyForKey:@"cellObject"];
 	
     // save via plist
-    [prefsDict setObject:color forKey:key];
+    [prefsDict setObject:saveValue forKey:key];
     [prefsDict writeToFile:plistPath atomically:NO];
 
     // save in CFPreferences
-    CFPreferencesSetValue((__bridge CFStringRef)key, (__bridge CFPropertyListRef)color, (__bridge CFStringRef)defaults, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+    CFPreferencesSetValue((__bridge CFStringRef)key, (__bridge CFPropertyListRef)saveValue, (__bridge CFStringRef)defaults, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
     CFPreferencesSynchronize((__bridge CFStringRef)defaults, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 
     // save in domain for NSUserDefaults
-	[[NSUserDefaults standardUserDefaults] setObject:color forKey:key inDomain:defaults];
+	[[NSUserDefaults standardUserDefaults] setObject:saveValue forKey:key inDomain:defaults];
 	
-	if (cell)
-		[cell refreshCellWithColor:[self colorForRGBSliders]];
+	if (cell && [cell isKindOfClass:[CSColorDisplayCell class]])
+		[(CSColorDisplayCell *)cell refreshCellWithColor:[self colorForRGBSliders]];
+    else if (cell && [cell isKindOfClass:[CSGradientDisplayCell class]])
+        [(CSGradientDisplayCell *)cell refreshCellWithColors:self.colors];
 		
     if ([self.specifier propertyForKey:@"PostNotification"])
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
@@ -336,6 +381,13 @@
         [constraints addObject:[NSLayoutConstraint constraintWithItem:self.colorPickerBlueSlider attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.colorPickerContainerView attribute:NSLayoutAttributeCenterX multiplier:1 constant:0]];
         [constraints addObject:[NSLayoutConstraint constraintWithItem:self.colorPickerBlueSlider attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.colorPickerContainerView attribute:NSLayoutAttributeTop multiplier:1 constant:80 + navHeight]];
         [constraints addObject:[NSLayoutConstraint constraintWithItem:self.colorPickerBlueSlider attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:40.0]];
+        if (self.isGradient) {
+            // gradient constraints
+            [constraints addObject:[NSLayoutConstraint constraintWithItem:self.gradientSelection attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:self.colorPickerContainerView.bounds.size.width]];
+            [constraints addObject:[NSLayoutConstraint constraintWithItem:self.gradientSelection attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.colorPickerContainerView attribute:NSLayoutAttributeCenterX multiplier:1 constant:0]];
+            [constraints addObject:[NSLayoutConstraint constraintWithItem:self.gradientSelection attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.colorPickerContainerView attribute:NSLayoutAttributeTop multiplier:1 constant:120 + navHeight]];
+            [constraints addObject:[NSLayoutConstraint constraintWithItem:self.gradientSelection attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:44.0]];
+        }
     } else {
         // label constraints
         [constraints addObject:[NSLayoutConstraint constraintWithItem:self.colorInformationLable attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.colorPickerContainerView attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0.0]];
@@ -375,6 +427,13 @@
         [constraints addObject:[NSLayoutConstraint constraintWithItem:self.colorPickerBlueSlider attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.colorPickerContainerView attribute:NSLayoutAttributeCenterX multiplier:1 constant:0]];
         [constraints addObject:[NSLayoutConstraint constraintWithItem:self.colorPickerBlueSlider attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.colorPickerContainerView attribute:NSLayoutAttributeTop multiplier:1 constant:80 + navHeight + statusHeight]];
         [constraints addObject:[NSLayoutConstraint constraintWithItem:self.colorPickerBlueSlider attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:40.0]];
+        if (self.isGradient) {
+            // gradient constraints
+            [constraints addObject:[NSLayoutConstraint constraintWithItem:self.gradientSelection attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:self.colorPickerContainerView.bounds.size.width]];
+            [constraints addObject:[NSLayoutConstraint constraintWithItem:self.gradientSelection attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.colorPickerContainerView attribute:NSLayoutAttributeCenterX multiplier:1 constant:0]];
+            [constraints addObject:[NSLayoutConstraint constraintWithItem:self.gradientSelection attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.colorPickerContainerView attribute:NSLayoutAttributeTop multiplier:1 constant:120 + navHeight + statusHeight]];
+            [constraints addObject:[NSLayoutConstraint constraintWithItem:self.gradientSelection attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:44.0]];
+        }
 
     }
     for (id constraint in constraints) {

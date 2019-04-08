@@ -73,4 +73,20 @@
     return [NSString isValidHexString:self];
 }
 
+- (NSArray<UIColor *> *)gradientStringColors {
+    NSMutableArray<UIColor *> *colors = [NSMutableArray new];
+    for (NSString *hex in [[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] componentsSeparatedByString:@","]) {
+        [colors addObject:[hex hexColor]];
+    }
+    return colors.copy;
+}
+
+- (NSArray<id> *)gradientStringCGColors {
+    NSMutableArray<id> *colors = [NSMutableArray new];
+    for (NSString *hex in [[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] componentsSeparatedByString:@","]) {
+        [colors addObject:(id)[hex hexColor].CGColor];
+    }
+    return colors.copy;
+}
+
 @end
