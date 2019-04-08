@@ -150,6 +150,10 @@
     return [UIColor hexStringFromColor:self];
 }
 
+- (NSString *)hexStringWithAlpha {
+    return [UIColor hexStringFromColor:self alpha:YES];
+}
+
 - (BOOL)light {
     return [UIColor isColorLight:self];
 }

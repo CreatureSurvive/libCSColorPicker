@@ -34,7 +34,11 @@
 	
 	if (!newColors) {
 		newColors = [self previewColors];
-	}
+	} else {
+        [self.specifier setProperty:newColors.lastObject.hexString forKey:@"hexValue"];
+        [self.specifier setProperty:newColors.lastObject forKey:@"color"];
+        [self.specifier setProperty:newColors forKey:@"colors"];
+    }
 	
     self.detailTextLabel.text = nil;
 	NSMutableArray<id> *colors = [NSMutableArray new];
@@ -141,7 +145,7 @@
     }
 
     if (colors.count < 2) [colors addObject:UIColor.redColor];
-    [self.specifier setProperty:colors.lastObject.hexString forKey:@"hexValue"];
+    [self.specifier setProperty:colors.lastObject.hexStringWithAlpha forKey:@"hexValue"];
     [self.specifier setProperty:colors.lastObject forKey:@"color"];
     [self.specifier setProperty:colors forKey:@"colors"];
 

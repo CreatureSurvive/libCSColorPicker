@@ -51,6 +51,9 @@
 // the hexString value of the color instance
 - (NSString *)hexString;
 
+// the hexString value of the color instance with alpha included
+- (NSString *)hexStringWithAlpha;
+
 // is this color instance light
 - (BOOL)light;
 

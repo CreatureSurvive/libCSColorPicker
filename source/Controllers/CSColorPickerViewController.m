@@ -228,7 +228,7 @@
     }];
 
     [alertController addAction:[UIAlertAction actionWithTitle:@"Copy Color" style:UIAlertActionStyleDefault handler:^(UIAlertAction *copy) {
-        [[UIPasteboard generalPasteboard] setString:alertController.textFields[0].text];
+        [[UIPasteboard generalPasteboard] setString:[self colorForHSBSliders].hexStringWithAlpha];
     }]];
 
     [alertController addAction:[UIAlertAction actionWithTitle:@"Set Color" style:UIAlertActionStyleDefault handler:^(UIAlertAction *set) {
@@ -245,7 +245,7 @@
 }
 
 - (UIColor *)startColor {
-    return self.isGradient ? self.colors.lastObject : [UIColor colorFromHexString:[self.specifier propertyForKey:@"hexValue"]];
+    return self.isGradient ? self.colors.lastObject : [self.specifier propertyForKey:@"color"];
 }
 
 - (void)addAction:(UIButton *)sender {
@@ -271,10 +271,10 @@
     NSString *saveValue = nil;
     if (self.isGradient) {
         for (UIColor *color in self.colors) {
-            saveValue = saveValue ? [saveValue stringByAppendingFormat:@",%@", color.hexString] : [NSString stringWithFormat:@"%@", color.hexString];
+            saveValue = saveValue ? [saveValue stringByAppendingFormat:@",%@", color.hexStringWithAlpha] : [NSString stringWithFormat:@"%@", color.hexStringWithAlpha];
         }
     } else {
-        saveValue = [UIColor hexStringFromColor:[self colorForRGBSliders] alpha:YES];
+        saveValue = [self colorForRGBSliders].hexStringWithAlpha;
     }
 
 	NSString *key = [self.specifier propertyForKey:@"key"];

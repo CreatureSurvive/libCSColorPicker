@@ -32,7 +32,10 @@
 	
 	if (!color) {
 		color = [self previewColor];
-	}
+	} else {
+        [self.specifier setProperty:color.hexStringWithAlpha forKey:@"hexValue"];
+        [self.specifier setProperty:color forKey:@"color"];
+    }
 	
 	self.cellColorDisplay.backgroundColor = color;
 	self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", [color hexString]];
