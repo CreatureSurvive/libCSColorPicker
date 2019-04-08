@@ -18,9 +18,9 @@ Best when used with [libCSPreference](https://creaturesurvive.github.io/repo/cyd
 
 ### Usage Instructions
 
-------
+---
 
-- Lets start with the Makefile and get libCSColorPicker properly linked to your project, to do so you can simply add this to your Makefile `MyAwsomeTweak_LDFLAGS += -lCSColorPicker`. Here is an example makefile for a project using libCSColorPicker:
+* Lets start with the Makefile and get libCSColorPicker properly linked to your project, to do so you can simply add this to your Makefile `MyAwsomeTweak_LDFLAGS += -lCSColorPicker`. Here is an example makefile for a project using libCSColorPicker:
 
 ```makefile
 ARCHS = arm64
@@ -56,7 +56,7 @@ Now lets take a look at the usage within your your Tweak.xm
 // lets set up a simple means of fetching values from out preferences
 // NOTE: this is just an example, you should cache the preference dictionary 
 // if you plan to use this in a tweak
-inline NSString *GetHexStringForPrefernceKey(NSString *key) {
+inline NSString *StringForPreferenceKey(NSString *key) {
     NSDictionary *prefs = [NSDictionary dictionaryWithContentsOfFile:PLIST_PATH] ? : [NSDictionary new];
     return prefs[key];
 }
@@ -65,10 +65,10 @@ inline NSString *GetHexStringForPrefernceKey(NSString *key) {
 
 // lets change the background color of MyAwsomeView using the color set in our preferences
 - (void)setBackgroundColor:(UIColor *)color {
-    // libCSColorPicker extendes the UIColor class so that usage is fimilar
-    // you can also use the C method hexStringFromColor(UIColor *color);
-    color = [UIColor colorFromHexString:GetHexStringForPrefernceKey(@"k_myAwesomeBackgroundColor)];
-   
+	// libCSColorPicker extendes the UIColor class so that usage is familiar
+	// you can also use the C method hexStringFromColor(UIColor *color);
+    color = [UIColor colorFromHexString:StringForPreferenceKey(@"k_myAwesomeBackgroundColor)];
+
    // lets see what else we can do with libCSColorPicker
    // outputs FF0000 assuming out color is red
    NSString *hex = [UIColor hexStringFromColor:color];
@@ -84,12 +84,33 @@ inline NSString *GetHexStringForPrefernceKey(NSString *key) {
    BOOL valid = [UIColor isValidHexString:@"FFFFFF"];
 }
 
+- (void)setGradienView {
+	// get an array of CGColors from a preference value, the value is a comma separated string of hex colors eg" FFFFFF,000000,111111
+	NSArray<id> *gradientColors = [StringForPreferenceKey(@"k_myAwesomeBackgroundGradient) gradientStringCGColors];
+
+	CAGradientLayer *gradient = [CAGradientLayer layer];
+    gradient.frame = self.view.bounds;
+
+	// left to right gradient
+    gradient.startPoint = CGPointMake(0, 0.5);
+    gradient.endPoint = CGPointMake(1, 0.5);
+
+	// set the gradient colors
+	gradient.colors = gradientColors;
+
+	// add the gradient to the view
+	[self.view addSublayer:gradient];
+
+	// if upi need an array of UIColors instead of CGColors use:
+	NSArray<UIColor *> ui_colors = [StringForPreferenceKey(@"k_myAwesomeBackgroundGradient) gradientStringColors]; 
+}
+
 %end
 ```
 
 
 
-- Now lets look at how we can set this up in our preferences to use the color picker. Once again lets start with the makefile by adding `MyAwesomeTweakPrefs_LDFLAGS += -lCSColorPicker` Here is an example makefile for a preferences using libCSColorPicker:
+* Now lets look at how we can set this up in our preferences to use the color picker. Once again lets start with the makefile by adding `MyAwesomeTweakPrefs_LDFLAGS += -lCSColorPicker` Here is an example makefile for a preferences using libCSColorPicker:
 
 ```
 ARCHS = arm64
@@ -115,7 +136,7 @@ internal-stage::
 
 
 
-- Now all thats left is to add it to one of our preferences plists like the Root.plist and set up the specifier.
+* Now all thats left is to add it to one of our preferences plists like the Root.plist and set up the specifier.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -127,6 +148,8 @@ internal-stage::
 		
 		<key>items</key>
 		<array>
+
+			<!-- color cell specifier -->
 			<dict>
 				<key>PostNotification</key>
 				<string>com.creaturecoding.MyAwsomeTweak.prefsChanged</string> 
@@ -142,8 +165,30 @@ internal-stage::
 				<string>k_myAwesomeBackgroundColor</string>
 				<key>label</key>
 				<string>My Awsome Background Color</string>
-				<key>fallback</key>
-				<string>FFFFFF</string>
+                <key>fallback</key>
+                <string>FFFFFF</string>
+				<key>alpha</key>
+				<false/>
+			</dict>
+
+			<!-- gradient cell specifier -->
+			<dict>
+				<key>PostNotification</key>
+				<string>com.creaturecoding.MyAwsomeTweak.prefsChanged</string> 
+				<key>cell</key>
+				<string>PSLinkCell</string>
+				<key>cellClass</key>
+				<string>CSGradientDisplayCell</string>
+				<key>defaults</key>
+				<string>com.creaturecoding.MyAwsomeTweak</string>
+				<key>defaultsPath</key>
+				<string>/Library/PreferenceBundles/MyAwesomeTweak.bundle</string>
+				<key>key</key>
+				<string>k_myAwesomeBackgroundGradient</string>
+				<key>label</key>
+				<string>My Awsome Background Gradient</string>
+                <key>fallback</key>
+                <string>FFFFFF,000000</string>
 				<key>alpha</key>
 				<false/>
 			</dict>
@@ -152,31 +197,55 @@ internal-stage::
 </plist>
 ```
 
+if you want to use defaultsPath instead of fallback to set default colors, then create a plist named `defaults.plist` in your preferences Resource folder and add an entry for each color like so:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<!-- default color for key -->
+		<key>k_myAwesomeBackgroundColor</key>
+		<string>FFFFFF</string>
+
+		<!-- default gradient for key -->
+		<key>k_myAwesomeBackgroundGradient</key>
+		<string>FFFFFF,000000</string>
+	</dict>
+</plis
+```
+
 
 
 Thats it, libCSColorPicker is ready to use in your project.
 
 ### Specifier configuration
 
-------
+---
 
-- 'cell' is required and should to be set to `PSLinkCell` to function properly
--  'cellClass' is required and should be set to `CSColorDisplayCell`
-- 'defaults' is required and should be the name of your preferences of your preferences plist in `/User/Library/Preferences`
-- 'defaultsPath' is optional, if provided it should point to your tweaks preference bundle. this allows you to store a `defaults.plist` in the resource folder of your preferences that will store default color values for your tweak.
-- 'fallback' is optional and if you have no value set in your preferences .plist, or defaultsPath, then this value will be used (NOTE: if none of these values are provided the color will default to RED or FF0000)
-- 'alpha' is optional and will default to true if not provided, it is responsible for disabling the alpha slider in the color picker, and all colors will have an alpha of 1
+* 'cell' is required and should to be set to `PSLinkCell` to function properly
+*  'cellClass' is required and should be set to `CSColorDisplayCell`
+* 'defaults' is required and should be the name of your preferences of your preferences plist in `/User/Library/Preferences`
+* 'defaultsPath' is optional, if provided it should point to your tweaks preference bundle. this allows you to store a `defaults.plist` in the resource folder of your preferences that will store default color values for your tweak.
+* 'fallback' is optional and if you have no value set in your preferences .plist, or defaultsPath, then this value will be used (NOTE: if none of these values are provided the color will default to RED or FF0000)
+* 'alpha' is optional and will default to true if not provided, it is responsible for disabling the alpha slider in the color picker, and all colors will have an alpha of 1
 
 
 ## Credits and Acknowledgments
+
+---
 
 Developed and Maintained by [CreatureSurvive](https://creaturecoding.com/) (Dana Buehre)
 
 ## License
 
+---
+
 - This software is licensed under the MIT License, detailed in the [LICENSE](https://github.com/CreatureSurvive/libCSColorPicker/tree/master/LICENCE) file
 - __Please don't steel my code!__ if you like to use it, then go ahead. Just be sure to provide proper credit.
 
 ## Submit Bugs & or Fixes
+
+---
 
 https://github.com/CreatureSurvive/libCSColorPicker/issues
