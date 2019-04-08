@@ -63,7 +63,7 @@
         }
     }
 
-    self.alphaEnabled = ([self.specifier propertyForKey:@"alpha"] && [[self.specifier propertyForKey:@"alpha"] boolValue]);
+    self.alphaEnabled = ([self.specifier propertyForKey:@"alpha"] && ![[self.specifier propertyForKey:@"alpha"] boolValue]) ? NO : YES;
     self.isGradient = ([self.specifier propertyForKey:@"gradient"] && [[self.specifier propertyForKey:@"gradient"] boolValue]);
 
     self.colorPickerContainerView = [[UIView alloc] initWithFrame:bounds];
