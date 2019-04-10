@@ -1,6 +1,6 @@
 ## v1.0 API changes
 
-libCSPreferences v1.0 has been released. in this release the API has been reworked to resolve conflicts with other projects, the legacy API has been officially marked depreciated and should not be used in new/updated projects. Legacy API will remain operational for now to ensure no projects are broken with this update. **Please Download the new [project resources](https://github.com/CreatureSurvive/libCSColorPicker/tree/master/CSColorPicker%20Resources) for theos and update your projects.**
+libCSColorPicker v1.0 has been released. in this release the API has been reworked to resolve conflicts with other projects, the legacy API has been officially marked depreciated and should not be used in new/updated projects. Legacy API will remain operational for now to ensure no projects are broken with this update. **Please Download the new [project resources](https://github.com/CreatureSurvive/libCSColorPicker/releases/latest) for theos and update your projects.**
 
 # libCSColorPicker
 
