@@ -1,13 +1,9 @@
 //
 // Created by CreatureSurvive on 3/17/17.
-// Copyright (c) 2018 CreatureCoding. All rights reserved.
+// Copyright (c) 2016 - 2019 CreatureCoding. All rights reserved.
 //
 
 #import <Cells/CSColorDisplayCell.h>
-
-// get the associated view controller from a UIView
-// credits https://stackoverflow.com/questions/1372977/given-a-view-how-do-i-get-its-viewcontroller/24590678
-#define UIViewParentController(__view) ({ UIResponder *__responder = __view; while ([__responder isKindOfClass:[UIView class]]) __responder = [__responder nextResponder]; (UIViewController *)__responder; })
 
 @implementation CSColorDisplayCell
 @synthesize cellColorDisplay;
@@ -17,6 +13,7 @@
     if ((self = [super initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier specifier:specifier])) {
         [specifier setTarget:self];
         [specifier setButtonAction:@selector(openColorPickerView)];
+        self.detailTextLabel.textColor = UIColor.lightGrayColor;
     }
 
     return self;
@@ -33,12 +30,12 @@
 	if (!color) {
 		color = [self previewColor];
 	} else {
-        [self.specifier setProperty:color.hexStringWithAlpha forKey:@"hexValue"];
+        [self.specifier setProperty:color.cscp_hexStringWithAlpha forKey:@"hexValue"];
         [self.specifier setProperty:color forKey:@"color"];
     }
 	
 	self.cellColorDisplay.backgroundColor = color;
-	self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", [color hexString]];
+	self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", [color cscp_hexString]];
 }
 
 - (void)didMoveToSuperview {
@@ -49,8 +46,7 @@
     [super didMoveToSuperview];
 
     [self configureColorDisplay];
-    [self updateCellLabels];
-    [self updateCellDisplayColor];
+    [self refreshCellWithColor:nil];
 }
 
 - (void)configureColorDisplay {
@@ -98,15 +94,6 @@
     [viewController.navigationController pushViewController:colorViewController animated:YES];
 }
 
-- (void)updateCellLabels {
-    self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", [[self previewColor] hexString]];
-    self.detailTextLabel.alpha = 0.65;
-}
-
-- (void)updateCellDisplayColor {
-    self.cellColorDisplay.backgroundColor = [self previewColor];
-}
-
 - (UIColor *)previewColor {
     NSString *userPrefsPath, *defaultsPlistPath, *motuumLSDefaultsPath, *hex;
     NSDictionary *prefsDict, *defaultsDict;
@@ -132,7 +119,7 @@
         hex = [self.specifier propertyForKey:@"fallback"] ? : @"FF0000";
     }
 
-    color = [UIColor colorFromHexString:hex];    
+    color = [UIColor cscp_colorFromHexString:hex];    
     [self.specifier setProperty:hex forKey:@"hexValue"];
     [self.specifier setProperty:color forKey:@"color"];
 
@@ -143,11 +130,5 @@
 
     return [super specifier];
 }
-
-// TODO implement this
-// - (void)setValue:(id)value {
-//     [super setValue:value];
-//     [self refreshCellDisplay];
-// }
 
 @end

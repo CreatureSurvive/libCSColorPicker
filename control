@@ -1,6 +1,6 @@
 Package: com.creaturesurvive.libcscolorpicker
 Name: libCSColorPicker
-Version: 0.9.3
+Version: 1.0
 Architecture: iphoneos-arm
 Depiction: https://creaturesurvive.github.io/repo/cydia/libcscolorpicker/depiction/
 Description: A minimal color picker library for developers

@@ -1,6 +1,6 @@
 //
 // Created by CreatureSurvive on 3/17/17.
-// Copyright (c) 2018 CreatureCoding. All rights reserved.
+// Copyright (c) 2016 - 2019 CreatureCoding. All rights reserved.
 //
 
 #import <Headers/PSSpecifier.h>
@@ -15,8 +15,6 @@
 @property (nonatomic, retain) NSMutableDictionary *options;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)identifier specifier:(PSSpecifier *)specifier;
-- (void)updateCellLabels;
-- (void)updateCellDisplayColor;
 - (void)refreshCellWithColor:(UIColor *)color;
 
 - (void)openColorPickerView;

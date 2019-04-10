@@ -1,7 +1,7 @@
 //
 // Created by Dana Buehre on 3/17/17.
-// Copyright (c) 2018 CreatureCoding. All rights reserved.
+// Copyright (c) 2016 - 2019 CreatureCoding. All rights reserved.
 //
 
-#import "Controllers/UIColor+CSColorPicker.h"
-#import "Controllers/NSString+CSColorPicker.h"
+#import "Categories/UIColor+CSColorPicker.h"
+#import "Categories/NSString+CSColorPicker.h"

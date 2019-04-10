@@ -1,13 +1,9 @@
 //
 // Created by CreatureSurvive on 3/17/17.
-// Copyright (c) 2018 CreatureCoding. All rights reserved.
+// Copyright (c) 2016 - 2019 CreatureCoding. All rights reserved.
 //
 
 #import <Cells/CSGradientDisplayCell.h>
-
-// get the associated view controller from a UIView
-// credits https://stackoverflow.com/questions/1372977/given-a-view-how-do-i-get-its-viewcontroller/24590678
-#define UIViewParentController(__view) ({ UIResponder *__responder = __view; while ([__responder isKindOfClass:[UIView class]]) __responder = [__responder nextResponder]; (UIViewController *)__responder; })
 
 @implementation CSGradientDisplayCell
 @synthesize cellColorDisplay, gradient;
@@ -18,7 +14,7 @@
         [specifier setTarget:self];
         [specifier setButtonAction:@selector(openColorPickerView)];
         [specifier setProperty:@(YES) forKey:@"gradient"];
-        self.detailTextLabel.alpha = 0.65;
+        self.detailTextLabel.textColor = UIColor.lightGrayColor;
     }
 
     return self;
@@ -35,7 +31,7 @@
 	if (!newColors) {
 		newColors = [self previewColors];
 	} else {
-        [self.specifier setProperty:newColors.lastObject.hexString forKey:@"hexValue"];
+        [self.specifier setProperty:newColors.lastObject.cscp_hexString forKey:@"hexValue"];
         [self.specifier setProperty:newColors.lastObject forKey:@"color"];
         [self.specifier setProperty:newColors forKey:@"colors"];
     }
@@ -44,8 +40,8 @@
 	NSMutableArray<id> *colors = [NSMutableArray new];
     for (UIColor *color in newColors) {
         if (self.detailTextLabel.text)
-            self.detailTextLabel.text = [self.detailTextLabel.text stringByAppendingFormat:@", #%@", color.hexString];
-        else self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", color.hexString];
+            self.detailTextLabel.text = [self.detailTextLabel.text stringByAppendingFormat:@", #%@", color.cscp_hexString];
+        else self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", color.cscp_hexString];
         [colors addObject:(id)color.CGColor];
     }
 
@@ -141,11 +137,11 @@
     }
 
     for (NSString *hex in [hexs componentsSeparatedByString:@","]) {
-        [colors addObject:[hex hexColor]];
+        [colors addObject:[hex cscp_hexColor]];
     }
 
     if (colors.count < 2) [colors addObject:UIColor.redColor];
-    [self.specifier setProperty:colors.lastObject.hexStringWithAlpha forKey:@"hexValue"];
+    [self.specifier setProperty:colors.lastObject.cscp_hexStringWithAlpha forKey:@"hexValue"];
     [self.specifier setProperty:colors.lastObject forKey:@"color"];
     [self.specifier setProperty:colors forKey:@"colors"];
 

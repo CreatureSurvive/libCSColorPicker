@@ -1,3 +1,8 @@
+//
+// Created by CreatureSurvive on 4/7/19.
+// Copyright (c) 2016 - 2019 CreatureCoding. All rights reserved.
+//
+
 #import <Views/CSGradientSelection.h>
 #import <Categories/UIColor+CSColorPicker.h>
 #import <Categories/NSString+CSColorPicker.h>
@@ -37,7 +42,8 @@
 	_scrollView.hidden = YES;
 
 	_gradient = [CAGradientLayer layer];
-    _gradient.frame = CGRectMake(0, self.bounds.size.height - 10, self.bounds.size.width, 10);
+    _gradient.frame = CGRectMake(0, self.bounds.size.height - 15, self.bounds.size.width, 15);
+	_gradient.colors = @[(id)UIColor.clearColor.CGColor, (id)UIColor.clearColor.CGColor];
     _gradient.startPoint = CGPointMake(0, 0.5);
     _gradient.endPoint = CGPointMake(1, 0.5);
 	_gradient.hidden = YES;
@@ -54,7 +60,7 @@
 	[super layoutSubviews];
 	_height = self.bounds.size.height;
 	_scrollView.contentSize = CGSizeMake(_scrollView.contentSize.width, _height);
-	self.gradient.frame = CGRectMake(0, self.bounds.size.height - 10, self.bounds.size.width, 10);
+	self.gradient.frame = CGRectMake(0, self.bounds.size.height - 15, self.bounds.size.width, 15);
 }
 
 - (void)setBackgroundColor:(UIColor *)color {
@@ -108,12 +114,19 @@
 	self.gradient.colors = gradientColors;
 }
 
+- (void)animateOffsetAndGradient {
+	[UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+		_scrollView.contentOffset = CGPointMake(_scrollView.contentSize.width > _scrollView.bounds.size.width ? _scrollView.contentSize.width - _scrollView.bounds.size.width : 0, 0);
+		[self updateGradient];
+	} completion:nil];
+}
+
 - (void)addColor:(UIColor *)color {
 	if (!_colors) _colors = [NSMutableArray new];
 	
 	[_colors addObject:color];
 	[self generateButtons];
-	[self updateGradient];
+	[self animateOffsetAndGradient];
 }
 
 - (void)addColors:(NSArray *)colors {
@@ -121,7 +134,7 @@
 	
 	[_colors addObjectsFromArray:colors];
 	[self generateButtons];
-	[self updateGradient];
+	[self animateOffsetAndGradient];
 }
 
 - (void)removeColorAtIndex:(NSInteger)index {
@@ -129,18 +142,20 @@
 	
 	[_colors removeObjectAtIndex:index];
 	[self generateButtons];
-	[self updateGradient];
+	[self animateOffsetAndGradient];
 }
 
 - (void)setColor:(UIColor *)color atIndex:(NSInteger)index {
 	if ((!_colors || _colors.count < index) || (!_buttons || _buttons.count < index)) return;
-	
+
 	_colors[index] = color;
 
-	UIColor *titleColor = color.light ? [UIColor darkTextColor] : [UIColor lightTextColor];
+	UIColor *titleColor = (!color.cscp_light && color.cscp_alpha > 0.5) ? UIColor.whiteColor : UIColor.blackColor;
+	UIColor *shadowColor = titleColor == UIColor.blackColor ? UIColor.whiteColor : UIColor.blackColor;
 	UIButton *button = _buttons[index];
 	[button.layer setBackgroundColor:color.CGColor];
-	[button setTitle:color.hexString forState:UIControlStateNormal];
+	[button.titleLabel.layer setShadowColor:shadowColor.CGColor];
+	[button setTitle:color.cscp_hexString forState:UIControlStateNormal];
 	[button setTitleColor:titleColor forState:UIControlStateNormal];
 	[button setTitleColor:[titleColor colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
 	
@@ -148,17 +163,26 @@
 }
 
 - (UIButton *)accessoryButtonWithColor:(UIColor *)color index:(NSInteger)index {
-	return [self.class accessoryButtonWithTitle:color.hexString target:self.target action:self.selectAction color:color index:index];
+	return [self.class accessoryButtonWithTitle:color.cscp_hexString target:self.target action:self.selectAction color:color index:index];
 }
 
 + (UIButton *)accessoryButtonWithTitle:(NSString *)title target:(id)target action:(SEL)action color:(UIColor *)color index:(NSInteger)index {
-	UIColor *titleColor = color.light ? [UIColor darkTextColor] : [UIColor lightTextColor];
+	UIColor *titleColor = (!color.cscp_light && color.cscp_alpha > 0.5) ? UIColor.whiteColor : UIColor.blackColor;
+    UIColor *shadowColor = titleColor == UIColor.blackColor ? UIColor.whiteColor : UIColor.blackColor;
 	UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
 	button.contentEdgeInsets = UIEdgeInsetsMake(5, 5, 5, 5);
 	button.layer.backgroundColor = color.CGColor;
-	button.layer.cornerRadius = 5.0;
-	button.tag = index;
+	button.layer.borderColor = UIColor.lightGrayColor.CGColor;
+	button.layer.borderWidth = 1;
+	button.layer.cornerRadius = 9.0;
+	button.tag = 199;
+
+	[button.titleLabel.layer setShadowOffset:CGSizeZero];
+    [button.titleLabel.layer setShadowRadius:1];
+    [button.titleLabel.layer setShadowOpacity:1];
+    [button.titleLabel.layer setShadowColor:shadowColor.CGColor];
 	
+	[button.titleLabel setTag:index];
 	[button.titleLabel setFont:[UIFont boldSystemFontOfSize:14]];
 	[button.titleLabel setAdjustsFontSizeToFitWidth:YES];
 	[button setTitle:@"0000000" forState:UIControlStateNormal];
@@ -176,6 +200,7 @@
 + (UIButton *)accessoryButtonSpace {
 	UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
 	button.contentEdgeInsets = UIEdgeInsetsMake(-3.0f, 2.0f, -3.0f, 2.0f);
+	button.tag = 199;
 
 	[button setTitle:@"" forState:UIControlStateNormal];
 	[button setTitleColor:[[UIColor darkTextColor] colorWithAlphaComponent:0.2] forState:UIControlStateNormal];

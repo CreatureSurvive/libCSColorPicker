@@ -1,6 +1,6 @@
 //
 // Created by CreatureSurvive on 3/17/17.
-// Copyright (c) 2018 CreatureCoding. All rights reserved.
+// Copyright (c) 2016 - 2019 CreatureCoding. All rights reserved.
 //
 
 #import <Controls/CSColorSlider.h>
@@ -48,9 +48,11 @@
     [self setMinimumValueImage:sliderValueImageLeft];
 
     // set thumb image
-    UIImage *thumbImage = [self imageWithColor:[UIColor lightGrayColor] size:CGSizeMake(5, 30)];
+    [self setThumbImage:[self imageWithColor:[UIColor lightGrayColor] size:CGSizeMake(5, 30)] forState:UIControlStateNormal];
 
-    [self setThumbImage:thumbImage forState:UIControlStateNormal];
+    // set min/max thumb images for label margins
+    [super setMinimumTrackImage:[self imageWithColor:[UIColor clearColor] size:CGSizeMake(1, 1)] forState:UIControlStateNormal];
+    [super setMaximumTrackImage:[self imageWithColor:[UIColor clearColor] size:CGSizeMake(1, 1)] forState:UIControlStateNormal];
 
     // set the slider label
     self.sliderLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -91,6 +93,19 @@
     _colorTrackHeight = (sliderType <= 2) ? 20 : (sliderType > 5) ? 20 : 2;
     [self updateTrackImage];
     [self setColor:startColor];
+
+    // fix eclipse coloring tracks
+    UIImageView *minTrack = [self performSelector:@selector(safeValueForKey:) withObject:@"_minTrackView"];
+    UIImageView *maxTrack = [self performSelector:@selector(safeValueForKey:) withObject:@"_maxTrackView"];
+    if (minTrack) {
+        minTrack.hidden = YES;
+        minTrack.tag = 199;
+    }
+
+    if (maxTrack) {
+        maxTrack.hidden = YES;
+        maxTrack.tag = 199;
+    }
 }
 
 - (void)layoutSubviews {
@@ -104,6 +119,8 @@
     self.colorTrackImageView.center = center;
 
 }
+
+#pragma mark UISlider Implementation
 
 - (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event {
     BOOL tracking = [super beginTrackingWithTouch:touch withEvent:event];
@@ -139,57 +156,42 @@
     }
 }
 
+- (void)setMinimumTrackImage:(UIImage *)image forState:(UIControlState)state {}
+- (void)setMaximumTrackImage:(UIImage *)image forState:(UIControlState)state {}
+
+#pragma mark - Color Methods
+
 - (UIColor *)colorFromCurrentValue {
     switch (self.sliderType) {
         case CSColorSliderTypeHue: {
-            return [UIColor colorWithHue:self.value
-                              saturation:1
-                              brightness:1.0
-                                   alpha:1.0];
+            return [UIColor colorWithHue:self.value saturation:1 brightness:1.0 alpha:1.0];
         }
         case CSColorSliderTypeSaturation: {
-            return [UIColor colorWithHue:1.0
-                              saturation:self.value
-                              brightness:1.0
-                                   alpha:1.0];
+            return [UIColor colorWithHue:1.0 saturation:self.value brightness:1.0 alpha:1.0];
         }
         case CSColorSliderTypeBrightness: {
-            return [UIColor colorWithHue:1.0
-                              saturation:1.0
-                              brightness:self.value
-                                   alpha:1.0];
+            return [UIColor colorWithHue:1.0 saturation:1.0 brightness:self.value alpha:1.0];
         }
         case CSColorSliderTypeRed: {
-            return [UIColor colorWithRed:self.value
-                                   green:1.0
-                                    blue:1.0
-                                   alpha:1.0];
+            return [UIColor colorWithRed:self.value green:1.0 blue:1.0 alpha:1.0];
         }
         case CSColorSliderTypeGreen: {
-            return [UIColor colorWithRed:1.0
-                                   green:self.value
-                                    blue:1.0
-                                   alpha:1.0];
+            return [UIColor colorWithRed:1.0 green:self.value blue:1.0 alpha:1.0];
         }
         case CSColorSliderTypeBlue: {
-            return [UIColor colorWithRed:1.0
-                                   green:1.0
-                                    blue:self.value
-                                   alpha:1.0];
+            return [UIColor colorWithRed:1.0 green:1.0 blue:self.value alpha:1.0];
         }
         case CSColorSliderTypeAlpha: {
-            return [UIColor colorWithRed:1.0
-                                   green:1.0
-                                    blue:1.0
-                                   alpha:self.value];
+            return [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:self.value];
         }
         default: {
-            return [UIColor colorWithHue:self.value
-                              saturation:1
-                              brightness:1.0
-                                   alpha:1.0];
+            return [UIColor colorWithHue:self.value saturation:1 brightness:1.0 alpha:1.0];
         }
     }
+}
+
+- (UIColor *)color {
+    return [self colorFromCurrentValue];
 }
 
 - (void)setColor:(UIColor *)color {
@@ -223,14 +225,97 @@
         } break;
     }
     
-    [self setValue:value];
+    [self setValue:value animated:YES];
     self.selectedColor = color;
     [self updateTrackImage];
     [self updateValueLabel];
 }
 
-- (UIColor *)color {
-    return [self colorFromCurrentValue];
+- (UIColor *)getMaxColor {
+    switch (self.sliderType) {
+        case CSColorSliderTypeBrightness: {
+            CGFloat h,s,b = 1,a;
+            [self.selectedColor getHue:&h saturation:&s brightness:nil alpha:&a];
+            return [UIColor colorWithHue:h saturation:s brightness:b alpha:a];
+        }
+        case CSColorSliderTypeSaturation: {
+            CGFloat h,s = 1,b,a;
+            [self.selectedColor getHue:&h saturation:nil brightness:&b alpha:&a];
+            return [UIColor colorWithHue:h saturation:s brightness:b alpha:a];
+        }
+        case CSColorSliderTypeAlpha: {
+            CGFloat h,s,b,a = 1;
+            [self.selectedColor getHue:&h saturation:&s brightness:&b alpha:nil];
+            return [UIColor colorWithHue:h saturation:s brightness:b alpha:a];
+        }
+        default: {
+            return self.selectedColor;
+        }
+    }
+}
+
+- (float)colorMaxValue {
+    switch (self.sliderType) {
+        case CSColorSliderTypeHue: {
+            return 360;
+        }
+        case CSColorSliderTypeSaturation:
+        case CSColorSliderTypeBrightness:
+        case CSColorSliderTypeAlpha: {
+            return 100;
+        }
+        case CSColorSliderTypeRed:
+        case CSColorSliderTypeGreen:
+        case CSColorSliderTypeBlue: {
+            return 255;
+        }
+        default: {
+            return 1;
+        }
+    }
+}
+
+#pragma mark - Update Views
+
+- (void)updateValueLabel {
+    [self.sliderValueLabel setText:[NSString stringWithFormat:@"%.f", self.value * [self colorMaxValue]]];
+}
+
+- (void)updateTrackImage {
+    switch (self.sliderType) {
+        case CSColorSliderTypeHue: {
+            self.currentTrackImage = [self hueTrackImage];
+        } break;
+        case CSColorSliderTypeSaturation: {
+            UIColor *maxColor = [self getMaxColor];
+            BOOL maxChanged = (self.maxColor != maxColor);
+            if ((self.maxColor = maxColor) && (!self.currentTrackImage || maxChanged)) self.currentTrackImage = [self imageWithGradientStart:[UIColor whiteColor] end:self.maxColor size:CGSizeMake(512, 1)];
+        } break;
+        case CSColorSliderTypeBrightness: {
+            UIColor *maxColor = [self getMaxColor];
+            BOOL maxChanged = (self.maxColor != maxColor);
+            if ((self.maxColor = maxColor) && (!self.currentTrackImage || maxChanged)) self.currentTrackImage = [self imageWithGradientStart:[UIColor blackColor] end:self.maxColor size:CGSizeMake(512, 1)];
+        } break;
+        case CSColorSliderTypeAlpha: {
+            UIColor *maxColor = [self getMaxColor];
+            BOOL maxChanged = (self.maxColor != maxColor);
+            if ((self.maxColor = maxColor) && (!self.currentTrackImage || maxChanged)) self.currentTrackImage = [self imageWithGradientStart:[UIColor clearColor] end:self.maxColor size:CGSizeMake(512, 1)];
+        } break;
+        case CSColorSliderTypeRed: {
+            if (!self.currentTrackImage) self.currentTrackImage = [self imageWithColor:[UIColor redColor] size:CGSizeMake(1, 1)];
+        } break;
+        case CSColorSliderTypeGreen: {
+            if (!self.currentTrackImage) self.currentTrackImage = [self imageWithColor:[UIColor greenColor] size:CGSizeMake(1, 1)];
+        } break;
+        case CSColorSliderTypeBlue: {
+            if (!self.currentTrackImage) self.currentTrackImage = [self imageWithColor:[UIColor blueColor] size:CGSizeMake(1, 1)];
+        } break;
+        default: {
+            if (!self.currentTrackImage) self.currentTrackImage = [self imageWithColor:[UIColor redColor] size:CGSizeMake(1, 1)];
+        } break;
+    }
+
+    [self.colorTrackImageView setImage:self.currentTrackImage];
 }
 
 - (UIImage *)imageWithColor:(UIColor *)color size:(CGSize)size {
@@ -266,64 +351,6 @@
     UIGraphicsEndImageContext();
 
     return img;
-}
-
-- (void)updateValueLabel {
-    [self.sliderValueLabel setText:[NSString stringWithFormat:@"%.f", self.value * [self colorMaxValue]]];
-}
-
-- (float)colorMaxValue {
-    switch (self.sliderType) {
-        case CSColorSliderTypeHue: {
-            return 360;
-        }
-        case CSColorSliderTypeSaturation:
-        case CSColorSliderTypeBrightness:
-        case CSColorSliderTypeAlpha: {
-            return 100;
-        }
-        case CSColorSliderTypeRed:
-        case CSColorSliderTypeGreen:
-        case CSColorSliderTypeBlue: {
-            return 255;
-        }
-        default: {
-            return 1;
-        }
-    }
-}
-
-- (void)updateTrackImage {
-    switch (self.sliderType) {
-        case CSColorSliderTypeHue: {
-            self.currentTrackImage = [self hueTrackImage];
-        } break;
-        case CSColorSliderTypeSaturation: {
-            self.currentTrackImage = [self imageWithGradientStart:[UIColor whiteColor] end:self.selectedColor size:CGSizeMake(512, 1)];
-        } break;
-        case CSColorSliderTypeBrightness: {
-            self.currentTrackImage = [self imageWithGradientStart:[UIColor blackColor] end:self.selectedColor size:CGSizeMake(512, 1)];
-        } break;
-        case CSColorSliderTypeRed: {
-            self.currentTrackImage = [self imageWithColor:[UIColor redColor] size:CGSizeMake(1, 1)];
-        } break;
-        case CSColorSliderTypeGreen: {
-            self.currentTrackImage = [self imageWithColor:[UIColor greenColor] size:CGSizeMake(1, 1)];
-        } break;
-        case CSColorSliderTypeBlue: {
-            self.currentTrackImage = [self imageWithColor:[UIColor blueColor] size:CGSizeMake(1, 1)];
-        } break;
-        case CSColorSliderTypeAlpha: {
-            self.currentTrackImage = [self imageWithGradientStart:[UIColor clearColor] end:self.selectedColor size:CGSizeMake(512, 1)];
-        } break;
-        default: {
-            self.currentTrackImage = [self imageWithColor:[UIColor redColor] size:CGSizeMake(1, 1)];
-        } break;
-    }
-
-    [self setMinimumTrackImage:[self imageWithColor:[UIColor clearColor] size:CGSizeMake(1, 1)] forState:UIControlStateNormal];
-    [self setMaximumTrackImage:[self imageWithColor:[UIColor clearColor] size:CGSizeMake(1, 1)] forState:UIControlStateNormal];
-    [self.colorTrackImageView setImage:self.currentTrackImage];
 }
 
 - (UIImage *)hueTrackImage {
