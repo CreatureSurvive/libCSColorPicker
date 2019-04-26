@@ -270,8 +270,9 @@
 }
 
 - (void)addAction:(UIButton *)sender {
-    [self.colors addObject:UIColor.redColor];
-    [self.gradientSelection addColor:UIColor.redColor];
+    UIColor *color = [self complementaryColorForColor:self.colors.lastObject];
+    [self.colors addObject:color];
+    [self.gradientSelection addColor:color];
     [self setColor:self.colors.lastObject animated:YES];
     self.selectedIndex = self.colors.count - 1;
 }
@@ -389,6 +390,23 @@
 
     _topConstraint = constraints.firstObject;
     [self.colorPickerContainerView addConstraints:constraints];
+}
+
+- (UIColor *)complementaryColorForColor:(UIColor *)color {
+    CGFloat h, s, b, a;
+    if ([color getHue:&h saturation:&s brightness:&b alpha:&a]) {
+        if (s < 0.25) {
+            b = ((int)((b * 100) + 10) % 100) / 100.0f;
+        }
+
+        else {
+            h = h - 0.1;
+            if (h < 0) h = 1.0f - fabs(h);
+        }
+
+        return [UIColor colorWithHue:h saturation:s brightness:b alpha:a];
+    }
+    return nil;
 }
 
 @end
