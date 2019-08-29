@@ -30,3 +30,15 @@ if [ -d "$SIMULATOR_LIB_PATH" ]; then
   sudo rm -rf "$SIMULATOR_LIB_PATH/libCSColorPicker.dylib" ||:
   sudo cp -rf "$THEOS_OBJ_DIR/libCSColorPicker.dylib" "$SIMULATOR_LIB_PATH"
 fi
+
+#install libCSColorPicker into the simulator that ships with Xcode beta
+
+echo "Installing libCSColorPicker to /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/CoreSimulator/Profiles/Runtimes/iOS.simruntime"
+
+BETA_SIMULATOR_ROOT=/Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/CoreSimulator/Profiles/Runtimes/iOS.simruntime/Contents/Resources/RuntimeRoot
+BETA_SIMULATOR_LIB_PATH=$SIMULATOR_ROOT/usr/lib
+
+if [ -d "$BETA_SIMULATOR_LIB_PATH" ]; then
+  sudo rm -rf "$BETA_SIMULATOR_LIB_PATH/libCSColorPicker.dylib" ||:
+  sudo cp -rf "$THEOS_OBJ_DIR/libCSColorPicker.dylib" "$BETA_SIMULATOR_LIB_PATH"
+fi
