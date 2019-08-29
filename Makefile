@@ -2,10 +2,10 @@ SIMULATOR ?= 0
 
 ifeq ($(SIMULATOR), 1)
 ARCHS = i386 x86_64
-TARGET = simulator:clang:9.2:9.0
+TARGET = simulator:clang:12.1:9.0
 else
 ARCHS = armv7 armv7s arm64 arm64e
-TARGET = iphone:clang:11.2:9.0
+TARGET = iphone:clang:12.1.2:9.0
 endif
 
 GO_EASY_ON_ME = 	0

@@ -5,15 +5,12 @@
 
 #import <Cells/CSColorDisplayCell.h>
 
-<<<<<<< HEAD
 #import <simulator.h>
 
 // get the associated view controller from a UIView
 // credits https://stackoverflow.com/questions/1372977/given-a-view-how-do-i-get-its-viewcontroller/24590678
 #define UIViewParentController(__view) ({ UIResponder *__responder = __view; while ([__responder isKindOfClass:[UIView class]]) __responder = [__responder nextResponder]; (UIViewController *)__responder; })
 
-=======
->>>>>>> upstream/master
 @implementation CSColorDisplayCell
 @synthesize cellColorDisplay;
 
@@ -38,16 +35,10 @@
 
 	if (!color) {
 		color = [self previewColor];
-<<<<<<< HEAD
-	}
-
-=======
 	} else {
-        [self.specifier setProperty:color.cscp_hexStringWithAlpha forKey:@"hexValue"];
-        [self.specifier setProperty:color forKey:@"color"];
-    }
-	
->>>>>>> upstream/master
+    [self.specifier setProperty:color.cscp_hexStringWithAlpha forKey:@"hexValue"];
+    [self.specifier setProperty:color forKey:@"color"];
+  }
 	self.cellColorDisplay.backgroundColor = color;
 	self.detailTextLabel.text = [NSString stringWithFormat:@"#%@", [color cscp_hexString]];
 }
@@ -133,11 +124,7 @@
         hex = [self.specifier propertyForKey:@"fallback"] ? : @"FF0000";
     }
 
-<<<<<<< HEAD
-    color = [UIColor colorFromHexString:hex];
-=======
-    color = [UIColor cscp_colorFromHexString:hex];    
->>>>>>> upstream/master
+    color = [UIColor cscp_colorFromHexString:hex];
     [self.specifier setProperty:hex forKey:@"hexValue"];
     [self.specifier setProperty:color forKey:@"color"];
 

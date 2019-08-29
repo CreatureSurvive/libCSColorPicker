@@ -5,11 +5,8 @@
 
 #import <Controllers/CSColorPickerViewController.h>
 
-<<<<<<< HEAD
 #import <simulator.h>
 
-@implementation CSColorPickerViewController
-=======
 #define SLIDER_HEIGHT 40.0
 #define GRADIENT_HEIGHT 50.0
 #define ALERT_TITLE @"Set Hex Color"
@@ -22,7 +19,6 @@
 @implementation CSColorPickerViewController {
     NSLayoutConstraint *_topConstraint;
 }
->>>>>>> upstream/master
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -207,9 +203,9 @@
         [self setColorInformationTextWithInformationFromColor:color];
     };
 
-    if (animated) 
+    if (animated)
         [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{ update(); } completion:nil];
-    else 
+    else
         update();
 }
 
@@ -217,7 +213,7 @@
     [self.colorInformationLable setText:[self informationStringForColor:color]];
     UIColor *legibilityTint = (!color.cscp_light && color.cscp_alpha > 0.5) ? UIColor.whiteColor : UIColor.blackColor;
     UIColor *shadowColor = legibilityTint == UIColor.blackColor ? UIColor.whiteColor : UIColor.blackColor;
-    
+
     [self.colorInformationLable setTextColor:legibilityTint];
     [self.colorInformationLable.layer setShadowColor:[shadowColor CGColor]];
     [self.colorInformationLable setFont:[UIFont boldSystemFontOfSize:[self isLandscape] ? 16 : 20]];
@@ -242,13 +238,9 @@
 
     NSString *plistPath = rPath([NSString stringWithFormat:@"/User/Library/Preferences/%@.plist", defaults]);
     NSMutableDictionary *prefsDict = [NSMutableDictionary dictionaryWithContentsOfFile:plistPath] ? : [NSMutableDictionary new];
-<<<<<<< HEAD
-	CSColorDisplayCell *cell = (CSColorDisplayCell *)[self.specifier propertyForKey:@"cellObject"];
 
-=======
 	UITableViewCell *cell = [self.specifier propertyForKey:@"cellObject"];
-	
->>>>>>> upstream/master
+
     // save via plist
     [prefsDict setObject:saveValue forKey:key];
     [prefsDict writeToFile:plistPath atomically:NO];
@@ -258,21 +250,13 @@
     CFPreferencesSynchronize((__bridge CFStringRef)defaults, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 
     // save in domain for NSUserDefaults
-<<<<<<< HEAD
-	[[NSUserDefaults standardUserDefaults] setObject:color forKey:key inDomain:defaults];
-
-	if (cell)
-		[cell refreshCellWithColor:[self colorForRGBSliders]];
-
-=======
 	[[NSUserDefaults standardUserDefaults] setObject:saveValue forKey:key inDomain:defaults];
-	
+
 	if (cell && [cell isKindOfClass:[CSColorDisplayCell class]])
 		[(CSColorDisplayCell *)cell refreshCellWithColor:[self colorForRGBSliders]];
     else if (cell && [cell isKindOfClass:[CSGradientDisplayCell class]])
         [(CSGradientDisplayCell *)cell refreshCellWithColors:self.colors];
-		
->>>>>>> upstream/master
+
     if ([self.specifier propertyForKey:@"PostNotification"])
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
                                              (CFStringRef)[self.specifier propertyForKey:@"PostNotification"],
