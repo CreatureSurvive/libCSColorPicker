@@ -1,6 +1,6 @@
 //
 // Created by CreatureSurvive on 3/17/17.
-// Copyright (c) 2018 CreatureCoding. All rights reserved.
+// Copyright (c) 2016 - 2019 CreatureCoding. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -19,6 +19,7 @@ typedef NSUInteger CSColorSliderType;
 @interface CSColorSlider : UISlider
 
 @property (nonatomic, strong) UIColor *color;
+@property (nonatomic, strong) UIColor *maxColor;
 @property (nonatomic, strong) UIColor *selectedColor;
 
 @property (nonatomic, strong) UILabel *sliderLabel;

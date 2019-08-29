@@ -9,13 +9,14 @@
 #import <Controllers/CSColorPickerViewController.h>
 
 
-@interface CSColorDisplayCell : PSTableCell
+@interface CSGradientDisplayCell : PSTableCell
 
 @property (nonatomic, retain) UIView *cellColorDisplay;
+@property (nonatomic, retain) CAGradientLayer *gradient;
 @property (nonatomic, retain) NSMutableDictionary *options;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)identifier specifier:(PSSpecifier *)specifier;
-- (void)refreshCellWithColor:(UIColor *)color;
+- (void)refreshCellWithColors:(NSArray<UIColor *> *)newColors;
 
 - (void)openColorPickerView;
 
