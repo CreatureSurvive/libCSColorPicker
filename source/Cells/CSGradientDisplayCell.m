@@ -5,6 +5,10 @@
 
 #import <Cells/CSGradientDisplayCell.h>
 
+// get the associated view controller from a UIView
+// credits https://stackoverflow.com/questions/1372977/given-a-view-how-do-i-get-its-viewcontroller/24590678
+#define UIViewParentController(__view) ({ UIResponder *__responder = __view; while ([__responder isKindOfClass:[UIView class]]) __responder = [__responder nextResponder]; (UIViewController *)__responder; })
+
 @implementation CSGradientDisplayCell
 @synthesize cellColorDisplay, gradient;
 
@@ -27,7 +31,7 @@
 }
 
 - (void)refreshCellWithColors:(NSArray<UIColor *> *)newColors {
-	
+
 	if (!newColors) {
 		newColors = [self previewColors];
 	} else {
@@ -35,7 +39,7 @@
         [self.specifier setProperty:newColors.lastObject forKey:@"color"];
         [self.specifier setProperty:newColors forKey:@"colors"];
     }
-	
+
     self.detailTextLabel.text = nil;
 	NSMutableArray<id> *colors = [NSMutableArray new];
     for (UIColor *color in newColors) {
@@ -69,13 +73,13 @@
     self.cellColorDisplay.layer.cornerRadius = CGRectGetHeight(self.cellColorDisplay.frame) / 4;
     self.cellColorDisplay.layer.borderWidth = 2;
     self.cellColorDisplay.layer.borderColor = [UIColor lightGrayColor].CGColor;
-    
+
     self.gradient = [CAGradientLayer layer];
     self.gradient.frame = self.cellColorDisplay.bounds;
     self.gradient.cornerRadius = self.cellColorDisplay.layer.cornerRadius;
     self.gradient.startPoint = CGPointMake(0, 0.5);
     self.gradient.endPoint = CGPointMake(1, 0.5);
-    
+
     [self.cellColorDisplay.layer addSublayer:self.gradient];
     [self setAccessoryView:self.cellColorDisplay];
 }
