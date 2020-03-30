@@ -65,7 +65,7 @@ inline NSString *StringForPreferenceKey(NSString *key) {
 - (void)setBackgroundColor:(UIColor *)color {
 	// libCSColorPicker extends the UIColor class so that usage is familiar
 	// you can also use the C method cscp_hexStringFromColor(UIColor *color);
-    color = [UIColor cscp_colorFromHexString:StringForPreferenceKey(@"k_myAwesomeBackgroundColor)];
+    color = [UIColor cscp_colorFromHexString:StringForPreferenceKey(@"k_myAwesomeBackgroundColor")];
 
    // lets see what else we can do with libCSColorPicker
    // outputs FF0000 assuming out color is red
@@ -84,7 +84,7 @@ inline NSString *StringForPreferenceKey(NSString *key) {
 
 - (void)setGradientView {
 	// get an array of CGColors from a preference value, the value is a comma separated string of hex colors eg" FFFFFF,000000,111111
-	NSArray<id> *gradientColors = [StringForPreferenceKey(@"k_myAwesomeBackgroundGradient) cscp_gradientStringCGColors];
+	NSArray<id> *gradientColors = [StringForPreferenceKey(@"k_myAwesomeBackgroundGradient") cscp_gradientStringCGColors];
 
 	CAGradientLayer *gradient = [CAGradientLayer layer];
     gradient.frame = self.view.bounds;
@@ -100,7 +100,7 @@ inline NSString *StringForPreferenceKey(NSString *key) {
 	[self.view addSublayer:gradient];
 
 	// if upi need an array of UIColors instead of CGColors use:
-	NSArray<UIColor *> ui_colors = [StringForPreferenceKey(@"k_myAwesomeBackgroundGradient) cscp_gradientStringColors]; 
+	NSArray<UIColor *> ui_colors = [StringForPreferenceKey(@"k_myAwesomeBackgroundGradient") cscp_gradientStringColors]; 
 }
 
 %end
