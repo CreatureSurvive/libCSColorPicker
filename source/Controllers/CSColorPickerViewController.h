@@ -25,6 +25,8 @@
 @property (nonatomic, strong) CSColorPickerBackgroundView *colorPickerBackgroundView;
 @property (nonatomic, strong) UIView *colorPickerPreviewView;
 @property (nonatomic, strong) CSGradientSelection *gradientSelection;
+@property (nonatomic, strong) UIVisualEffectView *topBackdrop;
+@property (nonatomic, strong) UIVisualEffectView *bottomBackdrop;
 
 @property (nonatomic, retain) CSColorSlider *colorPickerHueSlider;
 @property (nonatomic, retain) CSColorSlider *colorPickerSaturationSlider;

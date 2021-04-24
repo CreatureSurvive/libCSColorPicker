@@ -3,6 +3,8 @@
 // Copyright (c) 2016 - 2019 CreatureCoding. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
+
 @interface CSGradientSelection : UIView
 @property(nonatomic, weak, readonly) id target;
 @property(nonatomic, assign, readonly) SEL addAction;

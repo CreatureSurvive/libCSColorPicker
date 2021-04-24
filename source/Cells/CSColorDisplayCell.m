@@ -4,6 +4,7 @@
 //
 
 #import <Cells/CSColorDisplayCell.h>
+#import <Prefix.h>
 
 @implementation CSColorDisplayCell
 @synthesize cellColorDisplay;

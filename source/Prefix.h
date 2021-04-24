@@ -14,3 +14,23 @@
 	#define CSError(format, ...)
 	#define CSWarn(format, ...)
 #endif
+
+NS_INLINE BOOL firmwareGreaterThanEqual(NSString *version) {
+    return [[[UIDevice currentDevice] systemVersion] floatValue] >= [version floatValue];
+}
+
+NS_INLINE BOOL firmwareGreaterThan(NSString *version) {
+    return [[[UIDevice currentDevice] systemVersion] floatValue] > [version floatValue];
+}
+
+NS_INLINE BOOL firmwareLessThanEqual(NSString *version) {
+    return [[[UIDevice currentDevice] systemVersion] floatValue] <= [version floatValue];
+}
+
+NS_INLINE BOOL firmwareLessThan(NSString *version) {
+    return [[[UIDevice currentDevice] systemVersion] floatValue] < [version floatValue];
+}
+
+NS_INLINE BOOL firmwareEqual(NSString *version) {
+    return [[[UIDevice currentDevice] systemVersion] floatValue] == [version floatValue];
+}

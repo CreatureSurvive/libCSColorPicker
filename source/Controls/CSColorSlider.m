@@ -4,6 +4,7 @@
 //
 
 #import <Controls/CSColorSlider.h>
+#import <Prefix.h>
 
 @interface CSColorSlider ()
 
@@ -60,7 +61,7 @@
     [self.sliderLabel setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:16]];
     [self.sliderLabel setText:label];
     [self.sliderLabel setBackgroundColor:[UIColor clearColor]];
-    [self.sliderLabel setTextColor:[UIColor blackColor]];
+    [self.sliderLabel setTextColor:[UIColor respondsToSelector:@selector(labelColor)] ? [UIColor performSelector:@selector(labelColor)] : [UIColor blackColor]];
     [self.sliderLabel setTextAlignment:NSTextAlignmentLeft];
     [self insertSubview:self.sliderLabel atIndex:0];
     [self.sliderLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -73,19 +74,12 @@
     [self.sliderValueLabel setFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:16]];
     [self.sliderValueLabel setText:@"0"];
     [self.sliderValueLabel setBackgroundColor:[UIColor clearColor]];
-    [self.sliderValueLabel setTextColor:[UIColor blackColor]];
+    [self.sliderValueLabel setTextColor:[UIColor respondsToSelector:@selector(labelColor)] ? [UIColor performSelector:@selector(labelColor)] : [UIColor blackColor]];
     [self.sliderValueLabel setTextAlignment:NSTextAlignmentRight];
     [self insertSubview:self.sliderValueLabel atIndex:0];
     [self.sliderValueLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
     [self addConstraint:[NSLayoutConstraint constraintWithItem:self.sliderValueLabel attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeBottom multiplier:0.5 constant:0]];
     [self addConstraint:[NSLayoutConstraint constraintWithItem:self.sliderValueLabel attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeRight multiplier:0.98 constant:0]];
-
-    UIBlurEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
-    UIVisualEffectView *cellBackgroundBlur = [[UIVisualEffectView alloc] initWithEffect:effect];
-    cellBackgroundBlur.frame = self.bounds;
-    cellBackgroundBlur.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    cellBackgroundBlur.userInteractionEnabled = NO;
-    [self insertSubview:cellBackgroundBlur atIndex:0];
 
     self.sliderType = sliderType;
     self.selectedColor = startColor;

@@ -4,6 +4,7 @@
 //
 
 #import <Cells/CSGradientDisplayCell.h>
+#import <Prefix.h>
 
 @implementation CSGradientDisplayCell
 @synthesize cellColorDisplay, gradient;

@@ -27,12 +27,6 @@
 }
 
 - (void)commonInit {
-    UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight]];
-    blurView.frame = self.bounds;
-    blurView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    blurView.userInteractionEnabled = NO;
-	[self addSubview:blurView];
-
 	_buttonPadding = 2.5;
 	
 	_scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
@@ -48,7 +42,7 @@
     _gradient.endPoint = CGPointMake(1, 0.5);
 	_gradient.hidden = YES;
 
-	[blurView.layer addSublayer:self.gradient];
+	[self.layer addSublayer:self.gradient];
 
 	[self addSubview:_scrollView];
 	

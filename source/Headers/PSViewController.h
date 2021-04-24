@@ -3,6 +3,8 @@
 // Copyright (c) 2016 - 2019 CreatureCoding. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
+
 @interface PSViewController : UIViewController
 
 @property (nonatomic, retain) PSSpecifier *specifier;

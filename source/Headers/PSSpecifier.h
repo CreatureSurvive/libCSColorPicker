@@ -3,6 +3,8 @@
 // Copyright (c) 2016 - 2019 CreatureCoding. All rights reserved.
 //
 
+#import <Foundation/Foundation.h>
+
 @interface PSSpecifier : NSObject
 
 @property (nonatomic, assign) id target;
