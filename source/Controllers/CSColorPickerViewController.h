@@ -46,4 +46,6 @@
 - (void)sliderDidChange:(CSColorSlider *)sender;
 - (BOOL)isLandscape;
 
+- (void)dismiss;
+
 @end

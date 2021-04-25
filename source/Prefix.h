@@ -34,3 +34,8 @@ NS_INLINE BOOL firmwareLessThan(NSString *version) {
 NS_INLINE BOOL firmwareEqual(NSString *version) {
     return [[[UIDevice currentDevice] systemVersion] floatValue] == [version floatValue];
 }
+
+NS_INLINE __unused UINavigationController *NAVIGATION_WRAPPER_WITH_CONTROLLER(UIViewController *controller) {
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:controller];
+    return navigationController;
+}

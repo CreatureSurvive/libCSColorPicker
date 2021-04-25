@@ -27,6 +27,8 @@
     if (firmwareGreaterThanEqual(@"13.0")) {
         #pragma clang diagnostic push
         #pragma clang diagnostic ignored "-Wunguarded-availability"
+        self.navigationItem.title = self.specifier.name;
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismiss)];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"number.circle"] style:UIBarButtonItemStylePlain target:self action:@selector(presentHexColorAlert)];
         #pragma clang diagnostic pop
     } else {
@@ -441,6 +443,10 @@
         return [UIColor colorWithHue:h saturation:s brightness:b alpha:a];
     }
     return nil;
+}
+
+- (void)dismiss {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

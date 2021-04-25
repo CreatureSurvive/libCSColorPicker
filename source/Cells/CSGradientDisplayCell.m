@@ -114,7 +114,12 @@
     colorViewController.view.frame = viewController.view.frame;
     colorViewController.parentController = viewController;
     colorViewController.specifier = self.specifier;
-    [viewController.navigationController pushViewController:colorViewController animated:YES];
+    
+    if (firmwareGreaterThanEqual(@"13.0")) { 
+        [viewController presentViewController:NAVIGATION_WRAPPER_WITH_CONTROLLER(colorViewController) animated:YES completion:nil];
+    } else {
+        [viewController.navigationController pushViewController:colorViewController animated:YES];
+    }
 }
 
 - (NSArray<UIColor *> *)previewColors {

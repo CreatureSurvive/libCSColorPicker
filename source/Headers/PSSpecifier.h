@@ -7,6 +7,7 @@
 
 @interface PSSpecifier : NSObject
 
+@property (nonatomic, strong) NSString *name;
 @property (nonatomic, assign) id target;
 @property (nonatomic, assign) SEL buttonAction;
 

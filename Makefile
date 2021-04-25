@@ -20,5 +20,9 @@ $(LIBRARY_NAME)_CFLAGS 					+= -fobjc-arc -I$(INCLUDES) -IPrefix.pch
 
 include $(THEOS_MAKE_PATH)/library.mk
 
+
 # SUBPROJECTS += lcpshim
 # include $(THEOS_MAKE_PATH)/aggregate.mk
+
+after-stage::
+	$(ECHO_NOTHING)cp "$(THEOS_STAGING_DIR)/usr/lib/libCSColorPicker.dylib" "$(THEOS_PROJECT_DIR)/CSColorPicker Resources/libCSPreferences.dylib"$(ECHO_END)
