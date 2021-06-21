@@ -13,7 +13,45 @@ __attribute__((deprecated("WARNING: (_colorComponentFrom:start:length:) has been
 
 @implementation UIColor (CSColorPicker)
 
-+ (UIColor *)cscp_colorFromHexString:(NSString *)hexString {
++ (UIColor *)cscp_dynamicColorFromHexString:(NSString *)hexString {
+
+    if (!hexString || !hexString.length) return [UIColor redColor];
+
+    if (![hexString containsString:@" "] || ![hexString.lowercaseString containsString:@"l:"] || ![hexString.lowercaseString containsString:@"d:"]) {
+        return [self _cscp_colorFromHexString:hexString];
+    }
+
+    NSArray *components = [hexString componentsSeparatedByString:@" "];
+
+    if (!components || !components.count) {
+        return [self _cscp_colorFromHexString:hexString];
+    }
+
+    UIColor *light = [self _cscp_colorFromHexString:[components.firstObject substringFromIndex:2]];
+
+    if (@available(iOS 13.0, *)) {
+        UIColor *dark = [self _cscp_colorFromHexString:[components.lastObject substringFromIndex:2]];
+        return [UIColor colorWithDynamicProvider:^UIColor * (UITraitCollection *traitCollection) {
+            switch (traitCollection.userInterfaceStyle) {
+                case UIUserInterfaceStyleUnspecified:
+                case UIUserInterfaceStyleLight:
+                    return light;
+                case UIUserInterfaceStyleDark:
+                    return dark;
+            }
+            return light;
+        }];
+    }
+
+    return light;
+
+}
+
++ (UIColor *)cscp_colorFromHexString:(NSString *)hexString { 
+    return [self _cscp_colorFromHexString:hexString];
+}
+
++ (UIColor *)_cscp_colorFromHexString:(NSString *)hexString {
 
     NSString *colorString = [[hexString stringByReplacingOccurrencesOfString:@"#" withString:@""] uppercaseString];
     CGFloat alpha, red, blue, green;
@@ -72,6 +110,40 @@ __attribute__((deprecated("WARNING: (_colorComponentFrom:start:length:) has been
 + (BOOL)cscp_isValidHexString:(NSString *)hexString {
     NSCharacterSet *hexChars = [[NSCharacterSet characterSetWithCharactersInString:@"0123456789ABCDEFabcdef"] invertedSet];
     return (NSNotFound == [[[hexString stringByReplacingOccurrencesOfString:@"#" withString:@""] uppercaseString] rangeOfCharacterFromSet:hexChars].location);
+}
+
++ (NSString *)cscp_dynamicHexStringFromColor: (UIColor *)color {
+    return [self cscp_dynamicHexStringFromColor:color alpha:NO];
+}
+
++ (NSString *)cscp_dynamicHexStringFromColor: (UIColor *)color alpha:(BOOL)include {
+    
+    CGFloat rl,gl,bl,al,rd,gd,bd,ad;
+    BOOL (^componentsForColor)(UIColor*, CGFloat*, CGFloat*, CGFloat*, CGFloat*) = ^BOOL (UIColor*color ,CGFloat*red, CGFloat*green, CGFloat*blue, CGFloat*alpha) {
+        BOOL value = [color getRed:red green:green blue:blue alpha:alpha];
+        *red = roundf((float) (*red * 255.0f));
+        *green = roundf((float) (*green * 255.0f));
+        *blue = roundf((float) (*blue * 255.0f));
+        *alpha = roundf((float) (*blue * 255.0f));
+        return value;
+    };
+
+    if (@available(iOS 13.0, *)) {
+        componentsForColor(
+            [color resolvedColorWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight]],
+            &rl, &gl, &bl, &al
+        );
+        componentsForColor(
+            [color resolvedColorWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark]],
+            &rd, &gd, &bd, &ad
+        );
+    } else {
+        componentsForColor(color, &rl, &gl, &bl, &al);
+        componentsForColor(color, &rd, &gd, &bd, &ad);
+    }
+
+    return include ? [[NSString stringWithFormat:@"l:%02x%02x%02x%02x d:%02x%02x%02x%02x", (int)al, (int)rl, (int)gl, (int)bl, (int)ad, (int)rd, (int)gd, (int)bd] uppercaseString] :
+                     [[NSString stringWithFormat:@"l:%02x%02x%02x d:%02x%02x%02x", (int)rl, (int)gl, (int)bl, (int)rd, (int)gd, (int)bd] uppercaseString];
 }
 
 + (NSString *)cscp_hexStringFromColor:(UIColor *)color {
@@ -149,6 +221,14 @@ __attribute__((deprecated("WARNING: (_colorComponentFrom:start:length:) has been
     CGFloat b;
     [self getHue:NULL saturation:NULL brightness:&b alpha:NULL];
     return b;
+}
+
+- (NSString *)cscp_dynamicHexString {
+    return [UIColor cscp_dynamicHexStringFromColor:self];
+}
+
+- (NSString *)cscp_dynamicHexStringWithAlpha {
+    return [UIColor cscp_dynamicHexStringFromColor:self alpha:YES];
 }
 
 - (NSString *)cscp_hexString {

@@ -12,6 +12,14 @@
 @interface NSString (CSColorPicker)
 
 //
+// same as csp_colorFromHexString: returning a dynamic color
+// if the hex string is not dynamic, this will fallback to cscp_colorFromHexString:
+// supported formats include 'l:RGB d:RGB', 'l:ARGB d:ARGB', 'l:RRGGBB d:RRGGBB', 'l:AARRGGBB d:AARRGGBB', 'l:RGB:0.500000 d:RGB:0.500000', 'l:RRGGBB:0.500000 d:RRGGBB:0.500000'
+// all formats work with or without #
+//
++ (UIColor *)cscp_dynamicColorFromHexString:(NSString *)hexString;
+
+//
 // returns a UIColor from the hex string eg [UIColor cscp_colorFromHexString:@"#FF0000"];
 // if the hex string is invalid, returns red
 // supported formats include 'RGB', 'ARGB', 'RRGGBB', 'AARRGGBB', 'RGB:0.500000', 'RRGGBB:0.500000'
@@ -22,6 +30,11 @@
 //
 // returns true if the string is a valid hex (will pass with or without #)
 + (BOOL)cscp_isValidHexString:(NSString *)hexString;
+
+//
+// returns a string dynamic hex string representation of the string instance
+//
+- (UIColor *)cscp_dynamicHexColor;
 
 //
 // returns a string hex string representation of the string instance

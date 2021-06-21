@@ -39,3 +39,12 @@ NS_INLINE __unused UINavigationController *NAVIGATION_WRAPPER_WITH_CONTROLLER(UI
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:controller];
     return navigationController;
 }
+
+NS_INLINE __unused UIColor *secondaryLabelColor() {
+    
+    if (@available(iOS 13, *)) {
+        return [UIColor secondaryLabelColor];
+    }
+        
+    return [UIColor lightGrayColor];
+}

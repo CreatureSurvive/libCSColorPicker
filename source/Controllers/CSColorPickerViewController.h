@@ -6,8 +6,6 @@
 #import <Headers/PSSpecifier.h>
 #import <Controls/CSColorSlider.h>
 #import <Headers/PSViewController.h>
-#import <Cells/CSColorDisplayCell.h>
-#import <Cells/CSGradientDisplayCell.h>
 #import <Categories/UIColor+CSColorPicker.h>
 #import <Categories/NSString+CSColorPicker.h>
 #import <Views/CSColorPickerBackgroundView.h>
