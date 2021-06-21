@@ -3,21 +3,13 @@
 // Copyright (c) 2016 - 2019 CreatureCoding. All rights reserved.
 //
 
-#import <Headers/PSSpecifier.h>
-#import <Headers/PSTableCell.h>
-#import <Headers/PSViewController.h>
-#import <Controllers/CSColorPickerViewController.h>
+#import <Cells/CSBaseDisplayCell.h>
 
 
-@interface CSGradientDisplayCell : PSTableCell
+@interface CSGradientDisplayCell : CSBaseDisplayCell
 
-@property (nonatomic, retain) UIView *cellColorDisplay;
 @property (nonatomic, retain) CAGradientLayer *gradient;
-@property (nonatomic, retain) NSMutableDictionary *options;
 
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)identifier specifier:(PSSpecifier *)specifier;
 - (void)refreshCellWithColors:(NSArray<UIColor *> *)newColors;
-
-- (void)openColorPickerView;
 
 @end

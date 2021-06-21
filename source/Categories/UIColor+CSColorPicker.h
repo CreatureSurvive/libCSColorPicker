@@ -15,6 +15,16 @@
 + (UIColor *)cscp_colorFromHexString:(NSString *)hexString;
 
 //
+// returns a NSString representation of a UIColor in hex format eg [UIColor cscp_dynamicHexStringFromColor:[UIColor redColor]]; outputs @"l:#FF0000 d:#FF0000"
+//
++ (NSString *)cscp_dynamicHexStringFromColor: (UIColor *)color;
+
+//
+// returns a NSString representation of a UIColor in hex format eg [UIColor cscp_dynamicHexStringFromColor:[UIColor redColor] alpha:YES]; outputs @"#l:FFFF0000 d:FFFF0000"
+//
++ (NSString *)cscp_dynamicHexStringFromColor: (UIColor *)color alpha:(BOOL)include;
+
+//
 // returns a NSString representation of a UIColor in hex format eg [UIColor cscp_hexStringFromColor:[UIColor redColor]]; outputs @"#FF0000"
 //
 + (NSString *)cscp_hexStringFromColor:(UIColor *)color;
@@ -74,6 +84,16 @@
 // the brightness component the color instance
 //
 - (CGFloat)cscp_brightness;
+
+//
+// the dynamic hexString value of the color instance
+//
+- (NSString *)cscp_dynamicHexString;
+
+//
+// the dynamic hexString value of the color instance with alpha included
+//
+- (NSString *)cscp_dynamicHexStringWithAlpha;
 
 //
 // the hexString value of the color instance

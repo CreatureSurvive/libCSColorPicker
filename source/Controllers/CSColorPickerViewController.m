@@ -4,6 +4,8 @@
 //
 
 #import <Controllers/CSColorPickerViewController.h>
+#import <Cells/CSColorDisplayCell.h>
+#import <Cells/CSGradientDisplayCell.h>
 #import <Prefix.h>
 
 #define SLIDER_HEIGHT 40.0

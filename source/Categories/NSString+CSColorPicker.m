@@ -5,6 +5,7 @@
 
 #import "NSString+CSColorPicker.h"
 #import <UIKit/UIColor.h>
+#import <UIKit/UITraitCollection.h>
 
 struct CGFloat;
 @interface NSString (Private)
@@ -15,7 +16,45 @@ __attribute__((deprecated("WARNING: (_colorComponentFrom:start:length:) has been
 
 @implementation NSString (CSColorPicker)
 
-+ (UIColor *)cscp_colorFromHexString:(NSString *)hexString {
++ (UIColor *)cscp_dynamicColorFromHexString:(NSString *)hexString {
+
+    if (!hexString || !hexString.length) return [UIColor redColor];
+
+    if (![hexString containsString:@" "] || ![hexString.lowercaseString containsString:@"l:"] || ![hexString.lowercaseString containsString:@"d:"]) {
+        return [self _cscp_colorFromHexString:hexString];
+    }
+
+    NSArray *components = [hexString componentsSeparatedByString:@" "];
+
+    if (!components || !components.count) {
+        return [self _cscp_colorFromHexString:hexString];
+    }
+
+    UIColor *light = [self _cscp_colorFromHexString:[components.firstObject substringFromIndex:2]];
+
+    if (@available(iOS 13.0, *)) {
+        UIColor *dark = [self _cscp_colorFromHexString:[components.lastObject substringFromIndex:2]];
+        return [UIColor colorWithDynamicProvider:^UIColor * (UITraitCollection *traitCollection) {
+            switch (traitCollection.userInterfaceStyle) {
+                case UIUserInterfaceStyleUnspecified:
+                case UIUserInterfaceStyleLight:
+                    return light;
+                case UIUserInterfaceStyleDark:
+                    return dark;
+            }
+            return light;
+        }];
+    }
+
+    return light;
+
+}
+
++ (UIColor *)cscp_colorFromHexString:(NSString *)hexString { 
+    return [self _cscp_colorFromHexString:hexString];
+}
+
++ (UIColor *)_cscp_colorFromHexString:(NSString *)hexString {
     NSString *colorString = [[hexString stringByReplacingOccurrencesOfString:@"#" withString:@""] uppercaseString];
     CGFloat alpha, red, blue, green;
 
@@ -73,6 +112,10 @@ __attribute__((deprecated("WARNING: (_colorComponentFrom:start:length:) has been
 + (BOOL)cscp_isValidHexString:(NSString *)hexString {
     NSCharacterSet *hexChars = [[NSCharacterSet characterSetWithCharactersInString:@"0123456789ABCDEFabcdef"] invertedSet];
     return (NSNotFound == [[[hexString stringByReplacingOccurrencesOfString:@"#" withString:@""] uppercaseString] rangeOfCharacterFromSet:hexChars].location);
+}
+
+- (UIColor *)cscp_dynamicHexColor {
+    return [NSString cscp_dynamicColorFromHexString:self];
 }
 
 - (UIColor *)cscp_hexColor {

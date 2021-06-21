@@ -89,8 +89,8 @@
     [self setColor:startColor];
 
     // fix eclipse coloring tracks
-    UIImageView *minTrack = [self performSelector:@selector(safeValueForKey:) withObject:@"_minTrackView"];
-    UIImageView *maxTrack = [self performSelector:@selector(safeValueForKey:) withObject:@"_maxTrackView"];
+    UIImageView *minTrack = [self respondsToSelector:@selector(_minTrackView)] ? [self performSelector:@selector(_minTrackView)] : nil;
+    UIImageView *maxTrack = [self respondsToSelector:@selector(_maxTrackView)] ? [self performSelector:@selector(_maxTrackView)] : nil;
     if (minTrack) {
         minTrack.hidden = YES;
         minTrack.tag = 199;
